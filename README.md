@@ -1,6 +1,6 @@
 #### *Set Port: http://localhost:8080*
 
-*variable name*
+*[ User ] variable*
     
     - id: DB에 저장되는 user 자체의 id (신경 안 써도 될듯)
 
