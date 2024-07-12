@@ -6,7 +6,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import studio.aroundhub.member.controller.request.LoginRequest;
-import studio.aroundhub.member.controller.request.ResetRequest;
 import studio.aroundhub.member.controller.request.SignUpRequest;
 import studio.aroundhub.member.controller.response.UserResponse;
 import studio.aroundhub.member.repository.User;
@@ -88,7 +87,6 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("Incorrect ID or Password. Please check again."));
 
         //Cookie cookieId = new Cookie("userId", String.valueOf(user.getId()));
-
 
         return new UserResponse(
                 user.getId(),

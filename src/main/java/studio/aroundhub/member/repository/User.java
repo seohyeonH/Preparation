@@ -2,7 +2,9 @@ package studio.aroundhub.member.repository;
 
 import jakarta.persistence.*;
 import lombok.*;
+import studio.aroundhub.calendar.repository.Calendar;
 
+import java.util.List;
 
 @Entity
 @Table(name = "user")
@@ -48,6 +50,9 @@ public class User {
 
     @Column(name = "phoneNumber", nullable = false)
     private String phoneNumber;
+
+    @OneToMany(mappedBy = "user")
+    private List<Calendar> calendars;
 
     @Builder
     public User(String firstname, String lastname, int month, int day, int year, String loginId, String password, String gender, String phoneNumber, String country, String language) {

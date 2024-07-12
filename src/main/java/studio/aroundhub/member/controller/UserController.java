@@ -17,26 +17,26 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/user")
+@RequestMapping("/ba;da")
 public class UserController {
     private final UserService userService;
     private final UserRepository userRepository;
-    private SMSService smsService;
-
-    @GetMapping("/data")
-    public ResponseEntity<String> getData() {
-        return ResponseEntity.ok("Hello from Spring Boot");
-    }
-
-    @PostMapping("/data")
-    public ResponseEntity<String> postData(@RequestBody UserResponse data) {
-        // 데이터 처리 로직
-        return ResponseEntity.ok("Data received");
-    }
 
     @GetMapping("/")
     public String hello() {
-        return "Hello Around Hub Studio!";
+        return "Hello Ba;Da!";
+    }
+
+    /**
+     * user 찾기
+     * user_id로 사용자 정보를 조회하고 반환하는 로직 -> calendar에 필요
+     * @param user_id database 내의 user 자체의 id
+     * @return user의 정보
+     */
+    @GetMapping("/{user_id}")
+    public ResponseEntity<User> getUserById(@PathVariable Long user_id) {
+        User user = userRepository.findById(user_id).orElse(null);
+        return ResponseEntity.ok(user);
     }
 
     /** 회원 목록 조회
@@ -56,9 +56,9 @@ public class UserController {
         return ResponseEntity.ok(userService.findAllMemberTest());
     }
 
-    /** 회원가입
+    /**
+     * 회원가입
      * @param signUpRequest 회원가입 요청 정보
-     * @return 회원가입 성공 시 빈 JSON 객체 반환
      */
     @PostMapping("/signup")
     public ResponseEntity<?> addMember(@RequestBody SignUpRequest signUpRequest) {
@@ -70,21 +70,19 @@ public class UserController {
         }
     }
 
-    /** 로그인
+    /**
+     * 로그인
      * @param loginRequest 아이디, 비밀번호
      * @return 로그인한 회원 정보
-     * @throws IllegalAccessException 로그인 실패 시
      */
     @PostMapping("/login")
     public ResponseEntity<UserResponse> login(@RequestBody LoginRequest loginRequest) throws IllegalAccessException {
         return ResponseEntity.ok(userService.login(loginRequest));
     }
 
-    /** 아이디 찾기
-     * @param firstname 이름
-     * @param lastname 성
-     * @param phoneNumber 전화번호
-     * @return 사용자의 정보
+    /**
+     * 아이디 찾기
+     * @return 로그인한 회원 정보
      */
     @GetMapping("/find-loginId")
     public ResponseEntity<UserResponse> findLoginId(@RequestParam String firstname, @RequestParam String lastname,
@@ -93,8 +91,9 @@ public class UserController {
         return ResponseEntity.ok(userResponse);
     }
 
-    /** 비밀번호 찾기
-     * @return 비밀번호 재설정 성공 시 빈 JSON 객체 반환
+    /**
+     * 비밀번호 찾기
+     * @return "{}"
      */
     @PostMapping("/reset-password")
     public ResponseEntity<?> resetPassword(@RequestParam String loginId, @RequestParam String phoneNumber,
@@ -105,7 +104,6 @@ public class UserController {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleException(Exception e) {
-        // 예시: 오류 발생 시 명확한 오류 메시지 반환
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(Map.of("message", e.getMessage()));
     }
