@@ -129,6 +129,11 @@ public class UserService {
         User user = userRepository.findByLoginIdAndPhoneNumber(loginId, phoneNumber)
                 .orElseThrow(() -> new IllegalArgumentException("멘트 조정 중"));
 
+        // 비밀번호 길이 확인
+        if (newPassword.length() < 8) {
+            throw new IllegalArgumentException("Password must be at least 8 characters long");
+        }
+
         // 새로 설정한 비밀번호와 재확인 비밀번호가 다를 시
         if (!newPassword.equals(confirmPassword)) {
             throw new IllegalArgumentException("Check your password.");
@@ -138,6 +143,7 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
     }
+
     public UserResponse findUser(String loginId){
         User user = userRepository.findByLoginId(loginId).orElseThrow(() -> new IllegalArgumentException("해당 회원이 없습니다."));
         return new UserResponse(
@@ -152,14 +158,5 @@ public class UserService {
                 user.getCountry(),
                 user.getLanguage()
         );
-    }
-
-    public void resetPassword(SignUpRequest signUpRequest, ResetRequest resetRequest) {
-        User user = userRepository.findByLoginId(resetRequest.getLoginId()).orElseThrow(() -> new IllegalArgumentException("Please check your ID."));
-
-        if (user.getPassword().equals(signUpRequest.getPassword())) {
-            user.setPassword(passwordEncoder.encode(resetRequest.getPassword()));
-            userRepository.save(user);
-        }
     }
 }
