@@ -29,11 +29,6 @@ class CheckValidate {
       focusNode.requestFocus();
       return '비밀번호는 8자 이상 15자 이내여야 합니다';
     }
-    RegExp regex = RegExp(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$');
-    if (!regex.hasMatch(value)) {
-      focusNode.requestFocus();
-      return '특수문자, 대소문자, 숫자 포함 8자 이상 입력하세요';
-    }
     return null;
   }
 

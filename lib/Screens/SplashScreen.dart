@@ -58,11 +58,11 @@ class _SplashScreenState extends State<SplashScreen> {
             ),
             SizedBox(height: 8), // Add some space between the texts
             Text(
-              '어쩌구 하는 저쩌구',
+              '모두를 어우르는 바다',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.black,
-                fontSize: 11,
+                fontSize: 15,
                 fontFamily: 'Inter',
                 fontWeight: FontWeight.w400,
                 height: 1.2, // Adjust height for proper text alignment

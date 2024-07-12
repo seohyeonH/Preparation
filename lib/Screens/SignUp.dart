@@ -9,14 +9,16 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUp> {
+  final FocusNode _firstNameFocus = FocusNode();
+  final FocusNode _secondNameFocus = FocusNode();
+  final FocusNode _IDFocus = FocusNode();
   final FocusNode _passwordFocus = FocusNode();
   final FocusNode _confirmPasswordFocus = FocusNode();
   final FocusNode _birthFocus = FocusNode();
 
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-
-  String? _selectedGender;
   final TextEditingController _passwordController = TextEditingController();
+  String? _selectedGender;
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +29,9 @@ class _SignUpState extends State<SignUp> {
         child: SingleChildScrollView(
           child: Column(
             children: [
+              _showFirstNameInput(),
+              _showSecondNameInput(),
+              _showIDInput(),
               _showPasswordInput(),
               _showConfirmPasswordInput(),
               _showGenderInput(),
@@ -39,6 +44,69 @@ class _SignUpState extends State<SignUp> {
     );
   }
 
+  Widget _showFirstNameInput() {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
+      child: TextFormField(
+        focusNode: _firstNameFocus,
+        keyboardType: TextInputType.name,
+        decoration: InputDecoration(
+          border: OutlineInputBorder(),
+          labelText: 'First Name',
+          hintText: 'Please write your First Name.',
+        ),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'First Name is required';
+          }
+          return null;
+        },
+      ),
+    );
+  }
+
+  Widget _showSecondNameInput() {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
+      child: TextFormField(
+        focusNode: _secondNameFocus,
+        keyboardType: TextInputType.name,
+        decoration: InputDecoration(
+          border: OutlineInputBorder(),
+          labelText: 'Second Name',
+          hintText: 'Please write your Second Name.',
+        ),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Second Name is required';
+          }
+          return null;
+        },
+      ),
+    );
+  }
+
+  Widget _showIDInput() {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
+      child: TextFormField(
+        focusNode: _IDFocus,
+        keyboardType: TextInputType.text,
+        decoration: InputDecoration(
+          border: OutlineInputBorder(),
+          labelText: 'ID',
+          hintText: 'Please write your ID.',
+        ),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'ID is required';
+          }
+          return null;
+        },
+      ),
+    );
+  }
+
   Widget _showPasswordInput() {
     return Padding(
       padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
@@ -47,8 +115,11 @@ class _SignUpState extends State<SignUp> {
         focusNode: _passwordFocus,
         keyboardType: TextInputType.visiblePassword,
         obscureText: true,
-        decoration: _textFormDecoration(
-            '비밀번호', '특수문자, 대소문자, 숫자 포함 8자 이상 15자 이내로 입력하세요.'),
+        decoration: InputDecoration(
+          border: OutlineInputBorder(),
+          labelText: 'Password',
+          hintText: 'Must contain 8 characters.',
+        ),
         validator: (value) => CheckValidate().validatePassword(_passwordFocus, value!),
       ),
     );
@@ -61,10 +132,14 @@ class _SignUpState extends State<SignUp> {
         focusNode: _confirmPasswordFocus,
         keyboardType: TextInputType.visiblePassword,
         obscureText: true,
-        decoration: _textFormDecoration('비밀번호 확인', '비밀번호를 다시 입력해주세요'),
+        decoration: InputDecoration(
+          border: OutlineInputBorder(),
+          labelText: 'Confirm Password',
+          hintText: 'Check your password.',
+        ),
         validator: (value) {
           if (value != _passwordController.text) {
-            return '비밀번호가 일치하지 않습니다';
+            return 'Passwords do not match';
           }
           return null;
         },
@@ -74,22 +149,39 @@ class _SignUpState extends State<SignUp> {
 
   Widget _showGenderInput() {
     return Padding(
-      padding: EdgeInsets.fromLTRB(20, 20, 20, 0),
-      child: DropdownButtonFormField<String>(
-        decoration: _textFormDecoration('성별', '성별을 선택해주세요'),
-        value: _selectedGender,
-        items: ['남성', '여성', '기타'].map((String value) {
-          return DropdownMenuItem<String>(
-            value: value,
-            child: Text(value),
-          );
-        }).toList(),
-        onChanged: (newValue) {
-          setState(() {
-            _selectedGender = newValue;
-          });
-        },
-        validator: (value) => value == null ? '성별을 선택해주세요' : null,
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            'Select your gender:',
+            style: TextStyle(fontSize: 20),
+          ),
+          ListTile(
+            title: const Text('Male'),
+            leading: Radio<String>(
+              value: 'Male',
+              groupValue: _selectedGender,
+              onChanged: (String? value) {
+                setState(() {
+                  _selectedGender = value!;
+                });
+              },
+            ),
+          ),
+          ListTile(
+            title: const Text('Female'),
+            leading: Radio<String>(
+              value: 'Female',
+              groupValue: _selectedGender,
+              onChanged: (String? value) {
+                setState(() {
+                  _selectedGender = value!;
+                });
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -100,17 +192,13 @@ class _SignUpState extends State<SignUp> {
       child: TextFormField(
         focusNode: _birthFocus,
         keyboardType: TextInputType.datetime,
-        decoration: _textFormDecoration('생년월일', 'YYYY-MM-DD 형식으로 입력하세요'),
+        decoration: InputDecoration(
+          border: OutlineInputBorder(),
+          labelText: 'Date of Birth',
+          hintText: 'YYYY-MM-DD',
+        ),
         validator: (value) => CheckValidate().validateBirthDate(_birthFocus, value!),
       ),
-    );
-  }
-
-  InputDecoration _textFormDecoration(String hintText, String helperText) {
-    return InputDecoration(
-      contentPadding: EdgeInsets.fromLTRB(0, 16, 0, 0),
-      hintText: hintText,
-      helperText: helperText,
     );
   }
 
@@ -120,7 +208,7 @@ class _SignUpState extends State<SignUp> {
       child: MaterialButton(
         height: 50,
         color: Colors.blue,
-        child: Text('확인', style: TextStyle(color: Colors.white)),
+        child: Text('Submit', style: TextStyle(color: Colors.white)),
         onPressed: () {
           if (formKey.currentState!.validate()) {
             // Process data
