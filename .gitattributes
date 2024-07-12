@@ -1,0 +1,13 @@
+# 언어 설정
+*.java linguist-language=Java
+*.js linguist-language=JavaScript
+*.py linguist-language=Python
+*.dart linguist-language=Dart
+
+# 특정 디렉토리 제외
+node_modules/* linguist-vendored
+build/* linguist-vendored
+dist/* linguist-vendored
+
+# 특정 파일 제외
+*.min.js linguist-generated
