@@ -82,24 +82,29 @@ public class UserService {
 
     @Transactional
     public UserResponse login(LoginRequest loginRequest) {
-        // 로그인 아이디와 비밀번호로 사용자 찾기
-        User user = userRepository.findByLoginIdAndPassword(loginRequest.getLoginId(), loginRequest.getPassword())
+        // 로그인 아이디로 사용자 찾기
+        User user = userRepository.findByLoginId(loginRequest.getLoginId())
                 .orElseThrow(() -> new IllegalArgumentException("Incorrect ID or Password. Please check again."));
 
-        //Cookie cookieId = new Cookie("userId", String.valueOf(user.getId()));
+        // 해싱하여 저장해놓은 user의 비밀번호와 입력한 비밀번호가 일치한지 확인
+        if (passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+            return new UserResponse(
+                    user.getId(),
+                    user.getFirstname(),
+                    user.getLastname(),
+                    user.getDay(),
+                    user.getMonth(),
+                    user.getYear(),
+                    user.getPhoneNumber(),
+                    user.getGender(),
+                    user.getCountry(),
+                    user.getLanguage()
+            );
+        } else {
+            throw new IllegalArgumentException("Incorrect ID or Password. Please check again.");
+        }
 
-        return new UserResponse(
-                user.getId(),
-                user.getFirstname(),
-                user.getLastname(),
-                user.getDay(),
-                user.getMonth(),
-                user.getYear(),
-                user.getPhoneNumber(),
-                user.getGender(),
-                user.getCountry(),
-                user.getLanguage()
-        );
+        //Cookie cookieId = new Cookie("userId", String.valueOf(user.getId()));
     }
 
     public UserResponse findLoginId(String firstname, String lastname, String phoneNumber) {

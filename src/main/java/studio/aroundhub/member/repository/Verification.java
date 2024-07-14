@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Setter(AccessLevel.PROTECTED)
-@Table(name = "user/verification")
+@Table(name = "verification")
 public class Verification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
