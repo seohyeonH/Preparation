@@ -27,6 +27,10 @@ public class Verification {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
     public Verification(String phoneNumber, String code) {
         this.phoneNumber = phoneNumber;
         this.code = code;

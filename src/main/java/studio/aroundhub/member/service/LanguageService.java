@@ -2,6 +2,7 @@ package studio.aroundhub.member.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import studio.aroundhub.member.controller.request.SignUpRequest;
 import studio.aroundhub.member.repository.UserRepository;
 
@@ -20,8 +21,9 @@ public class LanguageService {
     // 언어 설정 변경
     // 로그인 아이디로 통해 회원을 찾고, 정보가 있을 시 새롭게 받은 언어를 재설정함.
     // 정보가 없을 경우는 고려 X. 로그인 했다는 거 자체가 정보가 있다는 의미.
-    public void changeLanguage(SignUpRequest signUpRequest, String newLanguage) {
-        userRepository.findByLoginId(signUpRequest.getLoginId()).ifPresent(user -> {
+    @Transactional
+    public void changeLanguage(String loginId, String newLanguage) {
+        userRepository.findByLoginId(loginId).ifPresent(user -> {
             user.setLanguage(newLanguage);
             userRepository.save(user);
         });

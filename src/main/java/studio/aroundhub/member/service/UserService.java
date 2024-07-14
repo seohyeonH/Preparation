@@ -104,26 +104,17 @@ public class UserService {
             throw new IllegalArgumentException("Incorrect ID or Password. Please check again.");
         }
 
+
         //Cookie cookieId = new Cookie("userId", String.valueOf(user.getId()));
     }
 
-    public UserResponse findLoginId(String firstname, String lastname, String phoneNumber) {
+    @Transactional
+    public String findLoginId(String firstname, String lastname, String phoneNumber) {
         // 이름과 성, 전화번호로 사용자 찾기
         User user = userRepository.findByFirstnameAndLastnameAndPhoneNumber(firstname, lastname, phoneNumber)
                 .orElseThrow(() -> new IllegalArgumentException("ID not found. Make sure your name and phone number are correct."));
 
-        return new UserResponse(
-                user.getId(),
-                user.getFirstname(),
-                user.getLastname(),
-                user.getDay(),
-                user.getMonth(),
-                user.getYear(),
-                user.getPhoneNumber(),
-                user.getGender(),
-                user.getCountry(),
-                user.getLanguage()
-        );
+        return user.getLoginId();
     }
 
     @Transactional
@@ -140,6 +131,36 @@ public class UserService {
         // 새로 설정한 비밀번호와 재확인 비밀번호가 다를 시
         if (!newPassword.equals(confirmPassword)) {
             throw new IllegalArgumentException("Check your password.");
+        }
+
+        // 변경 내용 저장
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
+
+    @Transactional
+    public void changePassword(String loginId, String currentPassword, String newPassword, String confirmPassword) {
+        // DB상 user의 id로 사용자 찾기
+        User user = userRepository.findByLoginId(loginId).orElseThrow();
+
+        // 현재 비밀번호와 user의 비밀번호가 다를 시,
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())){
+            throw new IllegalArgumentException("Current password is incorrect.");
+        }
+
+        // 현재 비밀번호와 새비밀번호가 같을 시,
+        if (currentPassword.equals(newPassword)) {
+            throw new IllegalArgumentException("New Password and Current Password are the same");
+        }
+
+        // 새비밀번호의 길이가 7 이하일 시,
+        if (newPassword.length() < 8) {
+            throw new IllegalArgumentException("Password must be at least 8 characters long");
+        }
+
+        // 새비밀번호와 확인비밀번호가 다를 시,
+        if (!newPassword.equals(confirmPassword)) {
+            throw new IllegalArgumentException("어떻게 할지 고민 중");
         }
 
         // 변경 내용 저장

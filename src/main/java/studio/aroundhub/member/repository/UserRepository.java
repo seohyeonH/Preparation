@@ -5,6 +5,7 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     // 회원 확인
+    Optional<User> findById(String userId);
     Optional<User> findByLoginIdAndPassword(String loginId, String password);
 
     // 아이디 중복 확인 + 비밀번호 찾기
@@ -13,6 +14,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // 아이디 & 비밀번호 찾기
     Optional<User> findByFirstnameAndLastnameAndPhoneNumber(String firstname, String lastname, String phoneNumber);
     Optional<User> findByLoginIdAndPhoneNumber(String LoginId, String phoneNumber);
+
+    // 비밀번호 변경
+    Optional<User> findByPassword(String password);
 
     // 탈퇴
     Optional<User> deleteByLoginId(String loginId);

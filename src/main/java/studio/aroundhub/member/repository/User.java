@@ -54,6 +54,9 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Calendar> calendars;
 
+    @OneToMany(mappedBy = "user")
+    private List<Verification> verificationcodes;
+
     @Builder
     public User(String firstname, String lastname, int month, int day, int year, String loginId, String password, String gender, String phoneNumber, String country, String language) {
         this.firstname = firstname;

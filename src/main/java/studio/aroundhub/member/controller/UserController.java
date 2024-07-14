@@ -82,23 +82,29 @@ public class UserController {
 
     /**
      * 아이디 찾기
-     * @return 로그인한 회원 정보
+     * @return 회원의 loginId
      */
     @GetMapping("/find-loginId")
-    public ResponseEntity<UserResponse> findLoginId(@RequestParam String firstname, @RequestParam String lastname,
+    public String findLoginId(@RequestParam String firstname, @RequestParam String lastname,
                                                     @RequestParam String phoneNumber) {
-        UserResponse userResponse = userService.findLoginId(firstname, lastname, phoneNumber);
-        return ResponseEntity.ok(userResponse);
+        return userService.findLoginId(firstname, lastname, phoneNumber);
     }
 
     /**
      * 비밀번호 찾기
      * @return "{}"
      */
-    @PostMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@RequestParam String loginId, @RequestParam String phoneNumber,
+    @PostMapping("/find-password")
+    public ResponseEntity<?> findPassword(@RequestParam String loginId, @RequestParam String phoneNumber,
                                            @RequestParam String newPassword, @RequestParam String confirmPassword) {
         userService.findPassword(loginId, phoneNumber, newPassword, confirmPassword);
+        return ResponseEntity.ok("{}");
+    }
+
+    @PostMapping("/{user_id}/changePassword")
+    public ResponseEntity<?> changePassword(@RequestParam String loginId, @RequestParam String currentPassword,
+                                            @RequestParam String newPassword, @RequestParam String confirmPassword){
+        userService.changePassword(loginId, currentPassword, newPassword, confirmPassword);
         return ResponseEntity.ok("{}");
     }
 
