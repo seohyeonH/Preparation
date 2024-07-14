@@ -1,11 +1,13 @@
 package studio.aroundhub.member.repository;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     // 회원 확인
-    Optional<User> findById(String userId);
+    @NotNull
+    Optional<User> findById(@NotNull Long user_id);
     Optional<User> findByLoginIdAndPassword(String loginId, String password);
 
     // 아이디 중복 확인 + 비밀번호 찾기

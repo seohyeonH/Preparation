@@ -6,7 +6,6 @@ import net.nurigo.sdk.message.model.Message;
 import net.nurigo.sdk.message.request.SingleMessageSendingRequest;
 import net.nurigo.sdk.message.response.SingleMessageSentResponse;
 import net.nurigo.sdk.message.service.DefaultMessageService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import studio.aroundhub.member.repository.Verification;
@@ -19,10 +18,9 @@ import java.util.Random;
 @Service
 @RequiredArgsConstructor
 public class SMSService {
-    private VerificationRepository verificationRepository;
+    private final VerificationRepository verificationRepository;
     private DefaultMessageService messageService;
-
-    private String fromNumber = "01099753084";
+    private final String fromNumber = "01099753084";
 
     @Transactional
     public SingleMessageSentResponse sendVerificationCode(String to) {
@@ -39,13 +37,21 @@ public class SMSService {
         SingleMessageSendingRequest request = new SingleMessageSendingRequest(message);
         SingleMessageSentResponse response = messageService.sendOne(request);
 
+        // SMS 전송 결과 검사
+        if (response == null) {
+            throw new RuntimeException("SMS 전송에 실패했습니다.");
+        }
+
         verificationRepository.save(new Verification(to, verificationCode));
 
         return response;
     }
 
     private String generateCode() {
-        return String.format("%06d", new Random().nextInt(1000000));
+        Random random = new Random();
+        int code = random.nextInt((int) Math.pow(10, 6));
+
+        return String.format("%06d", code);
     }
 
     @Transactional
@@ -54,10 +60,12 @@ public class SMSService {
 
         if (latestCode != null) {
             LocalDateTime now = LocalDateTime.now();
+
             if (ChronoUnit.MINUTES.between(latestCode.getCreatedAt(), now) <= 5) {
                 return latestCode.getCode().equals(Code);
             }
         }
+
         return false;
     }
 

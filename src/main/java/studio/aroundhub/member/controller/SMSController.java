@@ -1,19 +1,17 @@
 package studio.aroundhub.member.controller;
 
+import lombok.RequiredArgsConstructor;
 import net.nurigo.sdk.message.response.SingleMessageSentResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import studio.aroundhub.member.service.SMSService;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/ba;da/sms")
 public class SMSController {
-    private final SMSService smsService;
-
     @Autowired
-    public SMSController(SMSService smsService) {
-        this.smsService = smsService;
-    }
+    private final SMSService smsService;
 
     @PostMapping("/send-VerificationCode")
     public SingleMessageSentResponse sendVerification(@RequestParam String phoneNumber) {

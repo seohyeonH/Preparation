@@ -39,21 +39,13 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    /** 회원 목록 조회
-     * @return List<MemberResponse>
-     */
-    @GetMapping("/user-response")
-    public ResponseEntity getUserList() {
-        return ResponseEntity.ok(userService.findAllMember());
-    }
-
-    /** 회원 목록 조회 <br>
-     * Entity를 그대로 반환하는 경우
+    /**
+     * 회원 목록 조회 <br>
      * @return List<Member>
      */
-    @GetMapping("/members-test")
-    public ResponseEntity getUserListTest() {
-        return ResponseEntity.ok(userService.findAllMemberTest());
+    @GetMapping("/userlist")
+    public ResponseEntity<?> getUserListTest() {
+        return ResponseEntity.ok(userService.showAllUser());
     }
 
     /**
@@ -102,9 +94,9 @@ public class UserController {
     }
 
     @PostMapping("/{user_id}/changePassword")
-    public ResponseEntity<?> changePassword(@RequestParam String loginId, @RequestParam String currentPassword,
+    public ResponseEntity<?> changePassword(@PathVariable Long user_id, @RequestParam String currentPassword,
                                             @RequestParam String newPassword, @RequestParam String confirmPassword){
-        userService.changePassword(loginId, currentPassword, newPassword, confirmPassword);
+        userService.changePassword(user_id, currentPassword, newPassword, confirmPassword);
         return ResponseEntity.ok("{}");
     }
 

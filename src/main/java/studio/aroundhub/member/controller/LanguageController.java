@@ -1,24 +1,16 @@
 package studio.aroundhub.member.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import studio.aroundhub.member.repository.User;
-import studio.aroundhub.member.repository.UserRepository;
 import studio.aroundhub.member.service.LanguageService;
-import studio.aroundhub.member.service.UserService;
-
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/ba;da")
 public class LanguageController {
     private final LanguageService languageService;
-    private final UserRepository userRepository;
-
-    public LanguageController(LanguageService languageService, UserRepository userRepository) {
-        this.languageService = languageService;
-        this.userRepository = userRepository;
-    }
 
     @GetMapping("/languages")
     public List<String> getAllLanguages() {
@@ -26,8 +18,8 @@ public class LanguageController {
     }
 
     @PostMapping("/{user_id}/changeLanguage")
-    public ResponseEntity<?> changeLanguage(@RequestParam String loginId, @RequestParam String newlanguage){
-        languageService.changeLanguage(loginId, newlanguage);
+    public ResponseEntity<?> changeLanguage(@PathVariable Long user_id, @RequestParam String newlanguage){
+        languageService.changeLanguage(user_id, newlanguage);
         return ResponseEntity.ok("{}");
     }
 }

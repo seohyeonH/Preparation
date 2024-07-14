@@ -10,6 +10,7 @@ import java.util.List;
 @Entity
 @Table(name = "day")
 @Getter
+@Setter
 public class Day {
     @Id
     @Setter
@@ -17,12 +18,19 @@ public class Day {
     private int id;
 
     @Column(name = "date")
-    private LocalDate date;
+    public LocalDate date;
 
+    // 월별 임금
+    @Column(name = "monthly_wage")
+    public long monthly_wage;
+
+
+    // form 'calendar -> parent table'
     @ManyToOne
     @JoinColumn(name = "month")
     private Calendar calendar;
 
+    // form 'workplace -> child table'
     @OneToMany(mappedBy = "day", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Workplace> workplaces;
 }

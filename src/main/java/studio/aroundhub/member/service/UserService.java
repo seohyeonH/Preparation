@@ -19,25 +19,9 @@ public class UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    public List<User> findAllMemberTest() {
+    // 가입한 user 확인
+    public List<User> showAllUser() {
         return userRepository.findAll();
-    }
-
-    public List<UserResponse> findAllMember() {
-        return userRepository.findAll().stream()
-                .map(user ->
-                        new UserResponse(
-                                user.getId(),
-                                user.getFirstname(),
-                                user.getLastname(),
-                                user.getMonth(),
-                                user.getDay(),
-                                user.getYear(),
-                                user.getGender(),
-                                user.getPhoneNumber().replaceAll("-",""),
-                                user.getCountry(),
-                                user.getLanguage()
-                        )).toList();
     }
 
     // 회원가입
@@ -104,7 +88,6 @@ public class UserService {
             throw new IllegalArgumentException("Incorrect ID or Password. Please check again.");
         }
 
-
         //Cookie cookieId = new Cookie("userId", String.valueOf(user.getId()));
     }
 
@@ -139,9 +122,9 @@ public class UserService {
     }
 
     @Transactional
-    public void changePassword(String loginId, String currentPassword, String newPassword, String confirmPassword) {
+    public void changePassword(Long user_id, String currentPassword, String newPassword, String confirmPassword) {
         // DB상 user의 id로 사용자 찾기
-        User user = userRepository.findByLoginId(loginId).orElseThrow();
+        User user = userRepository.findById(user_id).orElseThrow();
 
         // 현재 비밀번호와 user의 비밀번호가 다를 시,
         if (!passwordEncoder.matches(currentPassword, user.getPassword())){
@@ -166,21 +149,5 @@ public class UserService {
         // 변경 내용 저장
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
-    }
-
-    public UserResponse findUser(String loginId){
-        User user = userRepository.findByLoginId(loginId).orElseThrow(() -> new IllegalArgumentException("해당 회원이 없습니다."));
-        return new UserResponse(
-                user.getId(),
-                user.getFirstname(),
-                user.getLastname(),
-                user.getMonth(),
-                user.getDay(),
-                user.getYear(),
-                user.getGender(),
-                user.getPhoneNumber(),
-                user.getCountry(),
-                user.getLanguage()
-        );
     }
 }

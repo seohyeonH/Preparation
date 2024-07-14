@@ -22,8 +22,8 @@ public class LanguageService {
     // 로그인 아이디로 통해 회원을 찾고, 정보가 있을 시 새롭게 받은 언어를 재설정함.
     // 정보가 없을 경우는 고려 X. 로그인 했다는 거 자체가 정보가 있다는 의미.
     @Transactional
-    public void changeLanguage(String loginId, String newLanguage) {
-        userRepository.findByLoginId(loginId).ifPresent(user -> {
+    public void changeLanguage(Long user_id, String newLanguage) {
+        userRepository.findById(user_id).ifPresent(user -> {
             user.setLanguage(newLanguage);
             userRepository.save(user);
         });

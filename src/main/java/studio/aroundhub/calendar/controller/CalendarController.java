@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import studio.aroundhub.calendar.repository.Calendar;
-import studio.aroundhub.calendar.repository.CalendarRepository;
 import studio.aroundhub.calendar.service.CalendarService;
 
 import java.util.List;

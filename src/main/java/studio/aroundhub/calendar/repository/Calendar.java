@@ -19,12 +19,14 @@ public class Calendar {
     private int id;
 
     @Column(name = "month")
-    private Month month;
+    public Month month;
 
+    // form 'user -> parent table'
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
+    // form 'day -> child table'
     @OneToMany(mappedBy = "calendar", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Day> days;
 }
