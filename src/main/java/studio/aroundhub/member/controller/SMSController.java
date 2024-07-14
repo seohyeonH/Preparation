@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import studio.aroundhub.member.service.SMSService;
 
 @RestController
-@RequestMapping("/api/sms")
+@RequestMapping("/ba;da/sms")
 public class SMSController {
     private final SMSService smsService;
 

@@ -7,7 +7,7 @@ import studio.aroundhub.member.service.LanguageService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/ba;da")
 public class LanguageController {
     private final LanguageService languageService;
 

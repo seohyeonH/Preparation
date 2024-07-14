@@ -7,7 +7,7 @@ import studio.aroundhub.member.service.CountryService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/ba;da")
 public class CountryController {
     private final CountryService countryService;
 
