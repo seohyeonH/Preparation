@@ -4,5 +4,5 @@
 - 2024.07.11 16:40 혜림 [  main branch  ] Splash Screen, Select Country, Set Language Upload.
 - 2024.07.12 22:53 서현 [ back branch ] Signup, Login, Find LoginId, Find Password, Verify Phonenumber Upload.
 - 2024.07.14 02:55 서현 [ back branch ] Form Calendar database Upload.
-- 2024.07.14 혜림티비 적도록
+- 2024.07.14 혜림 [front branch] SignUp, Enter Code, WhereAreYouFrom Splash Screen Upload, Splash Screen Modify
 - 2024.07.14 18:47 서현 [ back branch ] Define Method (associated with Calendar) Upload.
