@@ -7,4 +7,4 @@
 - 2024.07.14 02:55 서현 [ back branch ] Form Calendar database Upload.
 - 2024.07.14 혜림 [front branch] SignUp, Enter Code, WhereAreYouFrom Splash Screen Upload/ Splash Screen Update.
 - 2024.07.14 18:47 서현 [ back branch ] Define Method (associated with Calendar) Upload.
-- 2024.07.15 18:08 혜림 [ front branch ] Select Country, Set Language, Enter Code, SignUp, WhereAreYouFrom, main Update/ TermsOfService, Welcome!, What'sYourPhoneNumber Upload.
+- 2024.07.15 18:08 혜림 [ front branch ] Select Country, Set Language, Enter Code, main Update/ Welcome!, What'sYourPhoneNumber Upload.
