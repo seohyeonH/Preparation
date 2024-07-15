@@ -16,7 +16,7 @@ import java.util.List;
 @Setter
 public class Day {
     @Id
-    @Setter
+    @Setter // 달력을 통해 아마 일자별로 아이디 세팅할듯?
     @Column(name = "day_id")
     private Long id;
 
@@ -25,8 +25,7 @@ public class Day {
 
     // 월별 임금
     @Column(name = "monthly_wage")
-    public long monthly_wage;
-
+    public long monthly_wage = 0;
 
     // form 'calendar -> parent table'
     @ManyToOne

@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.awt.*;
 import java.sql.Time;
+import java.time.LocalTime;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -18,7 +19,7 @@ public class Workplace {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "workplace_id")
-    private Long id;
+    private Long workplace_id;
 
     @Column(name = "name")
     private String name;
@@ -30,13 +31,19 @@ public class Workplace {
     private String type;
 
     @Column(name = "breaktime")
-    private Time breaktime;
+    private int breaktime;
 
     @Column(name = "nightbreak")
-    private Time nightbreak;
+    private int nightbreak;
 
     @Column(name = "wage")
-    private int wage;
+    private double wage;
+
+    @Column(name = "start")
+    private LocalTime startTime;
+
+    @Column(name = "final")
+    private LocalTime finalTime;
 
     @Column(name = "Statutory-Leisure Pay")
     private boolean SLpay = false;
@@ -49,11 +56,16 @@ public class Workplace {
     @JoinColumn(name = "date")
     private Day day;
 
-    public Workplace(Long id, String name, Color label, String type, Time breaktime, Time nightbreak, int wage, boolean SLpay, boolean calculatemin, Day day) {
-        this.id = id;
+    @Column(name = "today_pay")
+    public double today_pay;
+
+    public Workplace(Long workplace_id, String name, Color label, String type, int breaktime, int nightbreak, LocalTime startTime, LocalTime finalTime, double wage, boolean SLpay, boolean calculatemin, Day day) {
+        this.workplace_id = workplace_id;
         this.name = name;
         this.label = label;
         this.type = type;
+        this.startTime = startTime;
+        this.finalTime = finalTime;
         this.breaktime = breaktime;
         this.nightbreak = nightbreak;
         this.wage = wage;
