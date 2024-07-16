@@ -8,3 +8,4 @@
 - 2024.07.14 혜림 [front branch] SignUp, Enter Code, WhereAreYouFrom Splash Screen Upload/ Splash Screen Update.
 - 2024.07.14 18:47 서현 [ back branch ] Define Method (associated with Calendar) Upload.
 - 2024.07.15 18:08 혜림 [ front branch ] Select Country, Set Language, Enter Code, main Update/ Welcome!, What'sYourPhoneNumber Upload.
+- 2024.07.16 21:30 혜림 [ front branch ] Select Country, Set Language, ApiService => update for connecting to server. / TermsOfService Upload
