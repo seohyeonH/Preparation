@@ -51,6 +51,10 @@ public class User {
     @Column(name = "phoneNumber", nullable = false)
     private String phoneNumber;
 
+    @Setter
+    @Column(name = "IskeepLogin")
+    private boolean keepLogin = false;
+
     @OneToMany(mappedBy = "user")
     private List<Calendar> calendars;
 

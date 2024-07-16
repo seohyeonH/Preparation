@@ -34,6 +34,7 @@ dependencies {
     implementation 'com.neovisionaries:nv-i18n:1.28'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'net.nurigo:sdk:4.3.0'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml'
 }
 
 tasks.named('test') {

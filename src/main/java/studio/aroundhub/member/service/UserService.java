@@ -1,13 +1,11 @@
 package studio.aroundhub.member.service;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import okhttp3.Cookie;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import studio.aroundhub.member.controller.request.LoginRequest;
 import studio.aroundhub.member.controller.request.SignUpRequest;
-import studio.aroundhub.member.controller.response.UserResponse;
 import studio.aroundhub.member.repository.User;
 import studio.aroundhub.member.repository.UserRepository;
 
@@ -20,6 +18,7 @@ public class UserService {
     private final BCryptPasswordEncoder passwordEncoder;
 
     // 가입한 user 확인
+    @Transactional(readOnly = true)
     public List<User> showAllUser() {
         return userRepository.findAll();
     }
@@ -43,10 +42,6 @@ public class UserService {
                     throw new IllegalArgumentException("The ID is unavailable.");
                 });
 
-        // 앞전에 받아둔 국가와 언어를 받기 위한 변수 설정
-        String country = signUpRequest.getCountry();
-        String language = signUpRequest.getLanguage();
-
         User user = User.builder()
                 .firstname(signUpRequest.getFirstname())
                 .lastname(signUpRequest.getLastname())
@@ -57,38 +52,32 @@ public class UserService {
                 .gender(signUpRequest.getGender())
                 .loginId(signUpRequest.getLoginId())
                 .password(passwordEncoder.encode(signUpRequest.getPassword())) // 비밀번호 암호화
-                .language(language)
-                .country(country)
+                .country(signUpRequest.getCountry())
+                .language(signUpRequest.getLanguage())
                 .build();
 
         userRepository.save(user);
     }
 
     @Transactional
-    public UserResponse login(LoginRequest loginRequest) {
+    public User login(String loginId, String password, boolean keepLogin, HttpSession session) {
         // 로그인 아이디로 사용자 찾기
-        User user = userRepository.findByLoginId(loginRequest.getLoginId())
+        User user = userRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new IllegalArgumentException("Incorrect ID or Password. Please check again."));
 
+        // 로그인 유지 여부
+        if(keepLogin){
+            session.setAttribute("user", user);
+            session.setMaxInactiveInterval(14 * 24 * 60 * 60);
+        }
+        user.setKeepLogin(keepLogin);
+
         // 해싱하여 저장해놓은 user의 비밀번호와 입력한 비밀번호가 일치한지 확인
-        if (passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-            return new UserResponse(
-                    user.getId(),
-                    user.getFirstname(),
-                    user.getLastname(),
-                    user.getDay(),
-                    user.getMonth(),
-                    user.getYear(),
-                    user.getPhoneNumber(),
-                    user.getGender(),
-                    user.getCountry(),
-                    user.getLanguage()
-            );
+        if (passwordEncoder.matches(password, user.getPassword())) {
+            return user;
         } else {
             throw new IllegalArgumentException("Incorrect ID or Password. Please check again.");
         }
-
-        //Cookie cookieId = new Cookie("userId", String.valueOf(user.getId()));
     }
 
     @Transactional
@@ -118,6 +107,16 @@ public class UserService {
 
         // 변경 내용 저장
         user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
+
+    @Transactional
+    public void changeLanguage(Long user_id, String newlanguage){
+        // DB상 user의 id로 사용자 찾기
+        User user = userRepository.findById(user_id).orElseThrow();
+
+        // 변경내용 저장
+        user.setLanguage(newlanguage);
         userRepository.save(user);
     }
 

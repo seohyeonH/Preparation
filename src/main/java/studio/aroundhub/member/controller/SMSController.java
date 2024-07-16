@@ -8,7 +8,7 @@ import studio.aroundhub.member.service.SMSService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/ba;da/sms")
+@RequestMapping("/api/sms")
 public class SMSController {
     @Autowired
     private final SMSService smsService;

@@ -12,7 +12,6 @@ public class SignUpRequest {
     private String loginId;
     private String password;
     private String confirmPassword;
-    private String certification_number;
     private String language;
     private String country;
     private String gender;
