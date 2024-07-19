@@ -7,7 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.awt.*;
-import java.sql.Time;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Entity
@@ -40,13 +41,10 @@ public class Workplace {
     private double wage;
 
     @Column(name = "start")
-    private LocalTime startTime;
+    private LocalDateTime startTime;
 
     @Column(name = "final")
-    private LocalTime finalTime;
-
-    @Column(name = "Statutory-Leisure Pay")
-    private boolean SLpay = false;
+    private LocalDateTime finalTime;
     
     @Column(name = "calculatemin")
     private boolean calculatemin = false;
@@ -57,9 +55,9 @@ public class Workplace {
     private Day day;
 
     @Column(name = "today_pay")
-    public double today_pay;
+    public double todayPay;
 
-    public Workplace(Long workplace_id, String name, Color label, String type, int breaktime, int nightbreak, LocalTime startTime, LocalTime finalTime, double wage, boolean SLpay, boolean calculatemin, Day day) {
+    public Workplace(Long workplace_id, String name, Color label, String type, int breaktime, int nightbreak, LocalDateTime startTime, LocalDateTime finalTime, double wage, Day day) {
         this.workplace_id = workplace_id;
         this.name = name;
         this.label = label;
@@ -69,8 +67,6 @@ public class Workplace {
         this.breaktime = breaktime;
         this.nightbreak = nightbreak;
         this.wage = wage;
-        this.SLpay = SLpay;
-        this.calculatemin = calculatemin;
         this.day = day;
     }
 }

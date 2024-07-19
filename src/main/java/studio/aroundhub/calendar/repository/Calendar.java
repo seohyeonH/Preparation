@@ -24,13 +24,16 @@ public class Calendar {
     @Column(name = "month")
     public Month month;
 
+    @Column(name = "monthly_wage")
+    private double monthlyWage;
+
     // form 'user -> parent table'
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
     // form 'day -> child table'
-    @OneToMany(mappedBy = "calendar", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "calendar", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Day> days;
 
     public Calendar(Month month, Long id, User user, List<Day> days) {

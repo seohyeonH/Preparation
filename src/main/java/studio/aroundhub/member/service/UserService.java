@@ -27,14 +27,12 @@ public class UserService {
     @Transactional
     public void signUp(SignUpRequest signUpRequest) {
         // 비밀번호 일치 확인
-        if (!signUpRequest.getPassword().equals(signUpRequest.getConfirmPassword())) {
+        if (!signUpRequest.getPassword().equals(signUpRequest.getConfirmPassword()))
             throw new IllegalArgumentException("Check your password");
-        }
 
         // 비밀번호 길이 확인
-        if (signUpRequest.getPassword().length() < 8) {
+        if (signUpRequest.getPassword().length() < 8)
             throw new IllegalArgumentException("Password must be at least 8 characters long");
-        }
 
         // 아이디 중복 확인
         userRepository.findByLoginId(signUpRequest.getLoginId())
@@ -73,11 +71,10 @@ public class UserService {
         user.setKeepLogin(keepLogin);
 
         // 해싱하여 저장해놓은 user의 비밀번호와 입력한 비밀번호가 일치한지 확인
-        if (passwordEncoder.matches(password, user.getPassword())) {
+        if (passwordEncoder.matches(password, user.getPassword()))
             return user;
-        } else {
+        else
             throw new IllegalArgumentException("Incorrect ID or Password. Please check again.");
-        }
     }
 
     @Transactional
@@ -96,14 +93,12 @@ public class UserService {
                 .orElseThrow(() -> new IllegalArgumentException("멘트 조정 중"));
 
         // 비밀번호 길이 확인
-        if (newPassword.length() < 8) {
+        if (newPassword.length() < 8)
             throw new IllegalArgumentException("Password must be at least 8 characters long");
-        }
 
         // 새로 설정한 비밀번호와 재확인 비밀번호가 다를 시
-        if (!newPassword.equals(confirmPassword)) {
+        if (!newPassword.equals(confirmPassword))
             throw new IllegalArgumentException("Check your password.");
-        }
 
         // 변경 내용 저장
         user.setPassword(passwordEncoder.encode(newPassword));
@@ -111,12 +106,12 @@ public class UserService {
     }
 
     @Transactional
-    public void changeLanguage(Long user_id, String newlanguage){
+    public void changeLanguage(Long user_id, String newLanguage){
         // DB상 user의 id로 사용자 찾기
         User user = userRepository.findById(user_id).orElseThrow();
 
         // 변경내용 저장
-        user.setLanguage(newlanguage);
+        user.setLanguage(newLanguage);
         userRepository.save(user);
     }
 
@@ -126,24 +121,20 @@ public class UserService {
         User user = userRepository.findById(user_id).orElseThrow();
 
         // 현재 비밀번호와 user의 비밀번호가 다를 시,
-        if (!passwordEncoder.matches(currentPassword, user.getPassword())){
+        if (!passwordEncoder.matches(currentPassword, user.getPassword()))
             throw new IllegalArgumentException("Current password is incorrect.");
-        }
 
         // 현재 비밀번호와 새비밀번호가 같을 시,
-        if (currentPassword.equals(newPassword)) {
+        if (currentPassword.equals(newPassword))
             throw new IllegalArgumentException("New Password and Current Password are the same");
-        }
 
         // 새비밀번호의 길이가 7 이하일 시,
-        if (newPassword.length() < 8) {
+        if (newPassword.length() < 8)
             throw new IllegalArgumentException("Password must be at least 8 characters long");
-        }
 
         // 새비밀번호와 확인비밀번호가 다를 시,
-        if (!newPassword.equals(confirmPassword)) {
+        if (!newPassword.equals(confirmPassword))
             throw new IllegalArgumentException("어떻게 할지 고민 중");
-        }
 
         // 변경 내용 저장
         user.setPassword(passwordEncoder.encode(newPassword));

@@ -16,7 +16,6 @@ import java.util.List;
 @Setter
 public class Day {
     @Id
-    @Setter // 달력을 통해 아마 일자별로 아이디 세팅할듯?
     @Column(name = "day_id")
     private Long id;
 
@@ -24,8 +23,8 @@ public class Day {
     public LocalDate date;
 
     // 월별 임금
-    @Column(name = "monthly_wage")
-    public long monthly_wage = 0;
+    @Column(name = "daily_wage")
+    private double dailyWage = 0;
 
     // form 'calendar -> parent table'
     @ManyToOne
@@ -33,13 +32,13 @@ public class Day {
     private Calendar calendar;
 
     // form 'workplace -> child table'
-    @OneToMany(mappedBy = "day", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "day", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Workplace> workplaces;
 
-    public Day(Long id, LocalDate date, long monthly_wage, Calendar calendar, List<Workplace> workplaces) {
+    public Day(Long id, LocalDate date, long daily_wage, Calendar calendar, List<Workplace> workplaces) {
         this.id = id;
         this.date = date;
-        this.monthly_wage = monthly_wage;
+        this.dailyWage = daily_wage;
         this.calendar = calendar;
         this.workplaces = workplaces;
     }

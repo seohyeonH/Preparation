@@ -17,9 +17,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByFirstnameAndLastnameAndPhoneNumber(String firstname, String lastname, String phoneNumber);
     Optional<User> findByLoginIdAndPhoneNumber(String LoginId, String phoneNumber);
 
-    // 비밀번호 변경
-    Optional<User> findByPassword(String password);
-
     // 탈퇴
     Optional<User> deleteByLoginId(String loginId);
 }
