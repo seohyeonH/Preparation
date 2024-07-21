@@ -5,41 +5,34 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import studio.aroundhub.member.repository.User;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Table(name = "day")
 @Getter
 @Setter
 public class Day {
     @Id
-    @Column(name = "day_id")
+    @Column(name = "day_id", nullable = false)
     private Long id;
 
-    @Column(name = "date")
+    @Column(name = "date", nullable = false)
     public LocalDate date;
 
-    // 월별 임금
+    // 일별 임금
     @Column(name = "daily_wage")
     private double dailyWage = 0;
 
-    // form 'calendar -> parent table'
+    // form 'user -> parent table'
     @ManyToOne
-    @JoinColumn(name = "month")
-    private Calendar calendar;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     // form 'workplace -> child table'
-    @OneToMany(mappedBy = "day", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "date", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Workplace> workplaces;
-
-    public Day(Long id, LocalDate date, long daily_wage, Calendar calendar, List<Workplace> workplaces) {
-        this.id = id;
-        this.date = date;
-        this.dailyWage = daily_wage;
-        this.calendar = calendar;
-        this.workplaces = workplaces;
-    }
 }

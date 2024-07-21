@@ -2,7 +2,7 @@ package studio.aroundhub.member.repository;
 
 import jakarta.persistence.*;
 import lombok.*;
-import studio.aroundhub.calendar.repository.Calendar;
+import studio.aroundhub.calendar.repository.Day;
 
 import java.util.List;
 
@@ -55,11 +55,9 @@ public class User {
     @Column(name = "IskeepLogin")
     private boolean keepLogin = false;
 
-    @OneToMany(mappedBy = "user")
-    private List<Calendar> calendars;
-
-    @OneToMany(mappedBy = "user")
-    private List<Verification> verificationcodes;
+    // form 'day -> child table'
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<Day> days;
 
     @Builder
     public User(String firstname, String lastname, int month, int day, int year, String loginId, String password, String gender, String phoneNumber, String country, String language) {
