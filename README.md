@@ -10,4 +10,5 @@
 - 2024.07.15 18:08 혜림 [ front branch ] Select Country, Set Language, Enter Code, main Update/ Welcome!, What'sYourPhoneNumber Upload.
 - 2024.07.16 21:30 혜림 [ front branch ] Select Country, Set Language, ApiService => update for connecting to server. / TermsOfService Upload
 - 2024.07.19 15:00 서현 [ back branch ] Modify Method (associated with Calendar) Upload.
-- 2024.07.21 20.01 서현 [ back branch ] Modify Method for connection with front-end.
+- 2024.07.21 20.01 서현 [ back branch ] Modify Method for connecting with front-end.
+- 2024.07.22 13.26 서현 [ back branch ] Modify Method for connecting with front-end.
