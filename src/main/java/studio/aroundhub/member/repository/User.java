@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import studio.aroundhub.calendar.repository.Day;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -51,13 +52,8 @@ public class User {
     @Column(name = "phoneNumber", nullable = false)
     private String phoneNumber;
 
-    @Setter
-    @Column(name = "IskeepLogin")
-    private boolean keepLogin = false;
-
-    // form 'day -> child table'
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<Day> days;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Day> days = new ArrayList<>();
 
     @Builder
     public User(String firstname, String lastname, int month, int day, int year, String loginId, String password, String gender, String phoneNumber, String country, String language) {

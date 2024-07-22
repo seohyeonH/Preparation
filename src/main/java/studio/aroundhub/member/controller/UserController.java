@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import studio.aroundhub.member.controller.request.LoginRequest;
 import studio.aroundhub.member.controller.request.SignUpRequest;
 import studio.aroundhub.member.controller.response.TemporaryResponse;
 import studio.aroundhub.member.repository.User;
@@ -96,9 +97,9 @@ public class UserController {
      * 로그인
      * @return 로그인한 회원 정보
      */
-    @PostMapping("/login")
-    public ResponseEntity<User> login(@RequestBody String loginId, String password, boolean keepLogin, HttpSession session) throws IllegalAccessException {
-        return ResponseEntity.ok(userService.login(loginId, password, keepLogin, session));
+    @GetMapping("/login")
+    public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest, HttpSession session) throws IllegalAccessException {
+        return ResponseEntity.ok(userService.login(loginRequest, session));
     }
 
     /**

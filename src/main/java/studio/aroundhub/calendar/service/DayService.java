@@ -4,8 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import studio.aroundhub.calendar.repository.*;
-import studio.aroundhub.calendar.repository.DayRepository;
-import studio.aroundhub.calendar.repository.WorkplaceRepository;
+import studio.aroundhub.member.repository.*;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -20,12 +19,44 @@ import java.util.stream.Collectors;
 public class DayService {
     private final DayRepository dayRepository;
     private final WorkplaceRepository workplaceRepository;
+    private final UserRepository userRepository;
+
+    // 월별 라벨 색상 패스
+    @Transactional(readOnly = true)
+    public List<Map<String, Object>> getLabels(String loginId, String startDate, String endDate) {
+        User user = userRepository.findByLoginId(loginId).orElse(null);
+        if (user == null) return List.of();
+
+        LocalDate start = LocalDate.parse(startDate);
+        LocalDate end = LocalDate.parse(endDate);
+
+        List<Day> days = user.getDays().stream()
+                .filter(day -> !day.getDate().isBefore(start) && !day.getDate().isAfter(end))
+                .toList();
+
+        List<Map<String, Object>> labels = new ArrayList<>();
+        for (Day d : days) {
+            d.getWorkplaces().forEach(workplace -> {
+                Map<String, Object> labelInfo = new HashMap<>();
+                labelInfo.put("date", d.getDate().toString());
+                labelInfo.put("workplace", workplace.getName());
+                labelInfo.put("color", workplace.getLabel());
+                labels.add(labelInfo);
+            });
+        }
+
+        return labels;
+    }
 
     // 일별 근무저장기록
     @Transactional(readOnly = true)
-    public List<Map<String, Object>> getWorkList(String date) {
-        Optional<Day> day = dayRepository.findByDate(LocalDate.parse(date));
+    public List<Map<String, Object>> getWorkList(String loginId, String date) {
+        User user = userRepository.findByLoginId(loginId).orElse(null);
+        if (user == null) return List.of();
 
+        Optional<Day> day = user.getDays().stream()
+            .filter(d -> d.getDate().equals(LocalDate.parse(date)))
+            .findFirst();
         if(day.isEmpty()) return List.of();
 
         Day d = day.get();
@@ -35,37 +66,35 @@ public class DayService {
             String hour = String.valueOf(duration.toHours());
             String minutes = String.valueOf(duration.toMinutes() % 60);
 
-            schedule.put("id", w.getWorkplace_id());
             schedule.put("workplace", w.getName());
             schedule.put("color", w.getLabel());
-            schedule.put("workTime", w.getStartTime() + " - " + w.getFinalTime());
+            schedule.put("workTime", w.getStartTime().toLocalTime() + " - " + w.getFinalTime().toLocalTime());
             schedule.put("hour", hour + "H " + minutes + "M");
             schedule.put("todaySalary", w.getTodayPay());
             return schedule;
         }).collect(Collectors.toList());
     }
 
+    // 일급 계산
     @Transactional
     public void calculateTodayWage(Long day_id, Long workplace_id){
         Day day = dayRepository.findById(day_id).orElse(null);
 
         if (day != null) {
             day.getWorkplaces().stream()
-                    .filter(w -> w.getWorkplace_id().equals(workplace_id))
-                    .findFirst()
-                    .ifPresent(w -> {
-                        Duration duration = Duration.between(w.getStartTime(), w.getFinalTime());
+                .filter(w -> w.getWorkplace_id().equals(workplace_id))
+                .findFirst()
+                .ifPresent(w -> {
+                    Duration duration = Duration.between(w.getStartTime(), w.getFinalTime());
 
-                        double total = duration.toHours() + ((duration.toMinutesPart() - w.getBreaktime()) % 60 / 60.0);
-                        double night = calculateNightWorkHours(w.getStartTime(), w.getFinalTime(), w.getNightbreak());
-                        double normal = total - night;
+                    double total = duration.toHours() + ((duration.toMinutesPart() - w.getBreaktime()) % 60 / 60.0);
+                    double night = calculateNightWorkHours(w.getStartTime(), w.getFinalTime(), w.getNightbreak());
+                    double normal = total - night;
 
-                        double wage = w.getWage();
+                    double wage = w.getWage();
 
-                        w.setTodayPay((wage * normal) + (wage * 1.5 * night));
-                        workplaceRepository.save(w);
-                    });
-
+                    w.setTodayPay((wage * normal) + (wage * 1.5 * night));
+                });
             calculateDailyWage(day_id);
         }
     }
@@ -108,31 +137,49 @@ public class DayService {
 
         if (day != null) {
             double dailyWage = day.getWorkplaces().stream()
-                    .mapToDouble(Workplace::getTodayPay)
-                    .sum();
+                .mapToDouble(Workplace::getTodayPay)
+                .sum();
 
             day.setDailyWage(dailyWage);
             dayRepository.save(day);
         }
     }
 
-    // 월별 임금 패스
+    // 월별 임금 & 월 근무시간 패스
     @Transactional(readOnly = true)
-    public Map<String, Object> getMonthlySalary(String startDate, String endDate) {
+    public Map<String, Object> getMonthlyInfo(String loginId, String startDate, String endDate) {
+        User user = userRepository.findByLoginId(loginId).orElse(null);
+        if (user == null) return Map.of();
+
         LocalDate start = LocalDate.parse(startDate);
         LocalDate end = LocalDate.parse(endDate);
 
-        List<Day> days = dayRepository.findByDateBetween(start, end);
+        List<Day> days = user.getDays().stream()
+             .filter(day -> !day.getDate().isBefore(start) && !day.getDate().isAfter(end))
+             .toList();
+
+        long workHour = days.stream()
+                .flatMap(day -> day.getWorkplaces().stream())
+                .mapToLong(workplace -> {
+                    Duration duration = Duration.between(workplace.getStartTime(), workplace.getFinalTime());
+                    return duration.toMinutes();
+                }).sum();
+        long hours = workHour / 60;
+        long minutes = workHour % 60;
 
         double total = days.stream()
-                .mapToDouble(Day::getDailyWage)
-                .sum();
+             .mapToDouble(Day::getDailyWage)
+             .sum();
 
         Map<String, Object> res = new HashMap<>();
         res.put("date", startDate + " - " + endDate);
         res.put("monthlyWage", total);
+        res.put("totalHour", hours + "H " + minutes + "M");
 
         return res;
     }
+    // 환율 적용한 월급 패스
 
+
+    // 다른 사용자의 정보 패스
 }

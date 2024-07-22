@@ -1,5 +1,6 @@
 package studio.aroundhub.calendar.repository;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -7,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
@@ -37,24 +39,26 @@ public class Workplace {
     @Column(name = "wage", nullable = false)
     private double wage;
 
-    @Column(name = "start", nullable = false)
+    @JsonProperty("startTime")
+    @Column(name = "startTime", nullable = false)
     private LocalDateTime startTime;
 
-    @Column(name = "final", nullable = false)
+    @JsonProperty("endTime")
+    @Column(name = "finalTime", nullable = false)
     private LocalDateTime finalTime;
-    
+
     @Column(name = "calculatemin", nullable = false)
     private boolean calculatemin = false;
 
     // form 'day -> parent table'
     @ManyToOne
     @JoinColumn(name = "day_id", nullable = false)
-    private Day date;
+    private Day day;
 
     @Column(name = "today_pay")
-    public double todayPay;
+    public double todayPay = 0;
 
-    public Workplace(Long workplace_id, String name, String label, String type, int breaktime, int nightbreak, LocalDateTime startTime, LocalDateTime finalTime, double wage, Day date) {
+    public Workplace(Long workplace_id, String name, String label, String type, int breaktime, int nightbreak, LocalDateTime startTime, LocalDateTime finalTime, double wage, Day day) {
         this.workplace_id = workplace_id;
         this.name = name;
         this.label = label;
@@ -64,6 +68,6 @@ public class Workplace {
         this.breaktime = breaktime;
         this.nightbreak = nightbreak;
         this.wage = wage;
-        this.date = date;
+        this.day = day;
     }
 }

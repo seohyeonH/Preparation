@@ -8,6 +8,7 @@ import lombok.Setter;
 import studio.aroundhub.member.repository.User;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -17,22 +18,20 @@ import java.util.List;
 @Setter
 public class Day {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "day_id", nullable = false)
     private Long id;
 
     @Column(name = "date", nullable = false)
     public LocalDate date;
 
-    // 일별 임금
     @Column(name = "daily_wage")
     private double dailyWage = 0;
 
-    // form 'user -> parent table'
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    // form 'workplace -> child table'
-    @OneToMany(mappedBy = "date", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<Workplace> workplaces;
+    @OneToMany(mappedBy = "day", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Workplace> workplaces = new ArrayList<>();
 }

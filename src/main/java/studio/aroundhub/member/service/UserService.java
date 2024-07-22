@@ -5,11 +5,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import studio.aroundhub.member.controller.request.LoginRequest;
 import studio.aroundhub.member.controller.request.SignUpRequest;
 import studio.aroundhub.member.repository.User;
 import studio.aroundhub.member.repository.UserRepository;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -58,21 +60,21 @@ public class UserService {
     }
 
     @Transactional
-    public User login(String loginId, String password, boolean keepLogin, HttpSession session) {
+    public String login(LoginRequest loginRequest, HttpSession session) {
         // 로그인 아이디로 사용자 찾기
-        User user = userRepository.findByLoginId(loginId)
+        User user = userRepository.findByLoginId(loginRequest.getLoginId())
                 .orElseThrow(() -> new IllegalArgumentException("Incorrect ID or Password. Please check again."));
 
-        // 로그인 유지 여부
-        if(keepLogin){
+        /* 로그인 유지 여부
+        if(loginRequest.isKeepLogin()){
             session.setAttribute("user", user);
             session.setMaxInactiveInterval(14 * 24 * 60 * 60);
         }
-        user.setKeepLogin(keepLogin);
+        user.setKeepLogin(loginRequest.isKeepLogin());*/
 
         // 해싱하여 저장해놓은 user의 비밀번호와 입력한 비밀번호가 일치한지 확인
-        if (passwordEncoder.matches(password, user.getPassword()))
-            return user;
+        if (passwordEncoder.matches(loginRequest.getPassword(), user.getPassword()))
+            return user.getLoginId();
         else
             throw new IllegalArgumentException("Incorrect ID or Password. Please check again.");
     }
@@ -140,4 +142,9 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
     }
+
+    /* 다른 유저 정보 패스
+    public List<Map<String, Object>> getUsers() {
+
+    }*/
 }

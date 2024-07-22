@@ -17,42 +17,68 @@ public class CalendarController {
     private final WorkplaceService workplaceService;
     private final DayService dayService;
 
-    // 일일 근무저장기록
+    // 월 라벨 데이터 패스 -> 확인
+    @GetMapping("/calendar")
+    public ResponseEntity<List<Map<String, Object>>> getLabels(@RequestBody Map<String, Object> payload) {
+        List<Map<String, Object>> labels = dayService.getLabels(
+                (String) payload.get("userId"),
+                (String) payload.get("startDate"),
+                (String) payload.get("endDate"));
+
+        if (labels.isEmpty()) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(labels);
+    }
+
+    // 근무 저장기록 -> 확인
     @GetMapping("/schedule")
-    public ResponseEntity<List<Map<String, Object>>> showSchedule(@RequestParam String date) {
-        List<Map<String, Object>> schedules = dayService.getWorkList(date);
+    public ResponseEntity<List<Map<String, Object>>> showSchedule(@RequestBody Map<String, Object> payload) {
+        List<Map<String, Object>> schedules = dayService.getWorkList(
+                (String) payload.get("userId"),
+                (String) payload.get("date"));
 
         if(schedules.isEmpty()) return ResponseEntity.notFound().build();
         return ResponseEntity.ok(schedules);
     }
 
-    // Add work
+    // Add work -> 확인
     @PostMapping("/schedule")
     public ResponseEntity<?> addWork(@RequestBody Map<String, Object> payload){
         workplaceService.addWork(payload);
         return ResponseEntity.ok().build();
     }
 
-    // Delete work
+    // Delete work -> 확인
     @DeleteMapping("/schedule")
     public ResponseEntity<?> deleteWork(@RequestBody Map<String, Object> payload) {
         workplaceService.deleteWork(payload);
         return ResponseEntity.ok().build();
     }
 
-    // Modify work
+    // Modify work 1 (정보 확인) -> 확인
+    @GetMapping("/modify")
+    public ResponseEntity<Map<String, Object>> getWorkplace(@RequestBody Map<String, Object> payload) {
+        Map<String, Object> data = workplaceService.modify(payload);
+
+        if(data.isEmpty()) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(data);
+    }
+
+    // Modify work 2 (정보 수정) -> 확인
     @PutMapping("/schedule")
     public ResponseEntity<?> modifyWork(@RequestBody Map<String, Object> payload) {
         workplaceService.modifyWork(payload);
         return ResponseEntity.ok().build();
     }
 
-    // 월별 임금
+    // 월별 임금  & 월 근무시간: 확인 / 근데 임금 시간 계산이 좀 애매
     @GetMapping("/calculate")
-    public ResponseEntity<Map<String, Object>> getMonthlySalary(@RequestParam String startDate, @RequestParam String endDate) {
-        Map<String, Object> monthlyPay = dayService.getMonthlySalary(startDate, endDate);
+    public ResponseEntity<Map<String, Object>> getMonthlyInfo(@RequestBody Map<String, Object> payload) {
+        Map<String, Object> monthlyData = dayService.getMonthlyInfo(
+                (String)payload.get("userId"),
+                (String) payload.get("startDate"),
+                (String) payload.get("endDate"));
 
-        if(monthlyPay.isEmpty()) return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(monthlyPay);
-    };
+        if(monthlyData.isEmpty()) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(monthlyData);
+    }
 }
