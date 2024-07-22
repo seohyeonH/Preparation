@@ -3,6 +3,7 @@ package studio.aroundhub.member.repository;
 import jakarta.persistence.*;
 import lombok.*;
 import studio.aroundhub.calendar.repository.Day;
+import studio.aroundhub.calendar.repository.Workplace;
 
 import java.util.ArrayList;
 import java.util.List;

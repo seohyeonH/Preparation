@@ -38,7 +38,7 @@ public class DayService {
         for (Day d : days) {
             d.getWorkplaces().forEach(workplace -> {
                 Map<String, Object> labelInfo = new HashMap<>();
-                labelInfo.put("date", d.getDate().toString());
+                labelInfo.put("Date", d.getDate().toString());
                 labelInfo.put("workplace", workplace.getName());
                 labelInfo.put("color", workplace.getLabel());
                 labels.add(labelInfo);
@@ -87,13 +87,13 @@ public class DayService {
                 .ifPresent(w -> {
                     Duration duration = Duration.between(w.getStartTime(), w.getFinalTime());
 
-                    double total = duration.toHours() + ((duration.toMinutesPart() - w.getBreaktime()) % 60 / 60.0);
                     double night = calculateNightWorkHours(w.getStartTime(), w.getFinalTime(), w.getNightbreak());
-                    double normal = total - night;
+                    double normal = (duration.toMinutes() - night * 60 - w.getBreaktime()) / 60.0;
 
                     double wage = w.getWage();
 
                     w.setTodayPay((wage * normal) + (wage * 1.5 * night));
+                    workplaceRepository.save(w);
                 });
             calculateDailyWage(day_id);
         }
@@ -178,8 +178,6 @@ public class DayService {
 
         return res;
     }
+
     // 환율 적용한 월급 패스
-
-
-    // 다른 사용자의 정보 패스
 }

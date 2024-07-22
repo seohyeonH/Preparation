@@ -23,6 +23,18 @@ public class WorkplaceService {
     private final WorkplaceRepository workplaceRepository;
     private final DayService dayService;
 
+    private void multiWorkplace(Workplace w, Map<String, Object> workplace, LocalDate date) {
+        w.setName((String) workplace.get("workplace"));
+        w.setLabel((String) workplace.get("color"));
+        w.setType((String) workplace.get("type"));
+        w.setStartTime(LocalDateTime.of(date, LocalTime.parse((String) workplace.get("startTime"))));
+        w.setFinalTime(LocalDateTime.of(date, LocalTime.parse((String) workplace.get("endTime"))));
+        w.setBreaktime((Integer) workplace.get("breakTime"));
+        w.setNightbreak((Integer) workplace.get("nightBreak"));
+        w.setCalculatemin((Boolean) workplace.get("IsMin"));
+        w.setWage((Boolean) workplace.get("IsMin") ? 9860.0 : ((Number) workplace.get("hourlyRate")).doubleValue());
+    }
+
     // Add Work
     @Transactional
     public void addWork(Map<String, Object> payload) {
@@ -33,9 +45,9 @@ public class WorkplaceService {
         String userId = (String) payload.get("userId");
 
         User user = userRepository.findByLoginId(userId).orElseThrow(() -> new RuntimeException("User not found"));
-        if (user == null) return;
 
         List<Day> selected = new ArrayList<>();
+        List<Workplace> workToCal = new ArrayList<>();
 
         for (String ds : dates) {
             LocalDate date = LocalDate.parse(ds);
@@ -44,30 +56,26 @@ public class WorkplaceService {
                 newD.setDate(date);
                 newD.setUser(user);
                 newD.setWorkplaces(new ArrayList<>());
+                dayRepository.save(newD);
                 return newD;
             });
 
             Workplace w = new Workplace();
-            w.setName((String) workplace.get("workplace"));
-            w.setLabel((String) workplace.get("color"));
-            w.setType((String) workplace.get("type"));
-            w.setStartTime(LocalDateTime.of(date, LocalTime.parse((String) workplace.get("startTime"))));
-            w.setFinalTime(LocalDateTime.of(date, LocalTime.parse((String) workplace.get("endTime"))));
-            w.setBreaktime((Integer) workplace.get("breakTime"));
-            w.setNightbreak((Integer) workplace.get("nightBreak"));
-            w.setCalculatemin((Boolean) workplace.get("IsMin"));
-            w.setWage((Boolean) workplace.get("IsMin") ? 9860.0 : ((Number) workplace.get("hourlyRate")).doubleValue());
+            multiWorkplace(w, workplace, date);
             w.setDay(day);
 
             day.getWorkplaces().add(w);
             if (!user.getDays().contains(day)) user.getDays().add(day);
 
             selected.add(day);
+            workplaceRepository.save(w);
+
+            dayService.calculateTodayWage(day.getId(), w.getWorkplace_id());
         }
         dayRepository.saveAll(selected);
 
-        for (Day d : selected)
-            dayService.calculateTodayWage(d.getId(), d.getWorkplaces().get(0).getWorkplace_id());
+        //for (Day d : selected)
+        //    dayService.calculateTodayWage(d.getId(), d.getWorkplaces().get(0).getWorkplace_id());
     }
 
     // Delete Work
@@ -76,13 +84,15 @@ public class WorkplaceService {
         String userId = (String) payload.get("userId");
         String workplace = ((String) payload.get("workplace"));
         LocalDate date = LocalDate.parse((String) payload.get("date"));
+        LocalDateTime startTime = LocalDateTime.of(date, LocalTime.parse((String) payload.get("startTime")));
+        LocalDateTime finalTime = LocalDateTime.of(date, LocalTime.parse((String) payload.get("endTime")));
 
         User user = userRepository.findByLoginId(userId).orElseThrow(() -> new RuntimeException("User not found"));
         if (user == null) return;
 
         dayRepository.findByUserAndDate(user, date).ifPresent(day -> {
             List<Workplace> list = day.getWorkplaces().stream()
-                    .filter(w -> w.getName().equals(workplace))
+                    .filter(w -> w.getName().equals(workplace) && w.getStartTime().equals(startTime) && w.getFinalTime().equals(finalTime))
                     .toList();
 
             if(!list.isEmpty())
@@ -129,7 +139,7 @@ public class WorkplaceService {
 
     // Modify Work
     @Transactional
-    public void modifyWork(Map<String, Object> payload){
+    public void modifyWork(Map<String, Object> payload) {
         @SuppressWarnings("unchecked")
         Map<String, Object> workplace = (Map<String, Object>) payload.get("workplace");
         LocalDate date = LocalDate.parse((String) payload.get("date"));
@@ -137,27 +147,24 @@ public class WorkplaceService {
 
         User user = userRepository.findByLoginId(userId).orElse(null);
 
+        List<Workplace> workToCal = new ArrayList<>();
+
         dayRepository.findByUserAndDate(user, date).ifPresent(day -> {
             List<Workplace> workplaces = day.getWorkplaces();
 
             workplaces.stream()
-                .filter(w -> w.getName().equals((String) workplace.get("workplace")))
-                .findFirst()
-                .ifPresent(w -> {
-                    w.setName((String) workplace.get("workplace"));
-                    w.setLabel((String) workplace.get("color"));
-                    w.setType((String) workplace.get("type"));
-                    w.setStartTime(LocalDateTime.of(date, LocalTime.parse((String) workplace.get("startTime"))));
-                    w.setFinalTime(LocalDateTime.of(date, LocalTime.parse((String) workplace.get("endTime"))));
-                    w.setBreaktime((Integer) workplace.get("breakTime"));
-                    w.setNightbreak((Integer) workplace.get("nightBreak"));
-                    w.setCalculatemin((Boolean) workplace.get("IsMin"));
-                    w.setWage((Boolean) workplace.get("IsMin") ? 9860.0 : ((Number) workplace.get("hourlyRate")).doubleValue());
-                    w.setDay(day);
+                    .filter(w -> w.getName().equals((String) workplace.get("workplace")))
+                    .findFirst()
+                    .ifPresent(w -> {
+                        multiWorkplace(w, workplace, date);
+                        w.setDay(day);
 
-                    dayRepository.save(day);
-                    dayService.calculateTodayWage(w.getDay().getId(), w.getWorkplace_id());
-                });
+                        workToCal.add(w);
+                    });
+            dayRepository.save(day);
         });
+
+        for (Workplace w : workToCal)
+            dayService.calculateTodayWage(w.getDay().getId(), w.getWorkplace_id());
     }
 }

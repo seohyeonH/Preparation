@@ -6,6 +6,7 @@
     </list>
     <writeAnnotations>
       <writeAnnotation name="jakarta.persistence.Column" />
+      <writeAnnotation name="jakarta.persistence.OneToMany" />
     </writeAnnotations>
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />

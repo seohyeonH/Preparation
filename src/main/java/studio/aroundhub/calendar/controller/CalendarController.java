@@ -19,14 +19,23 @@ public class CalendarController {
 
     // 월 라벨 데이터 패스 -> 확인
     @GetMapping("/calendar")
-    public ResponseEntity<List<Map<String, Object>>> getLabels(@RequestBody Map<String, Object> payload) {
-        List<Map<String, Object>> labels = dayService.getLabels(
-                (String) payload.get("userId"),
-                (String) payload.get("startDate"),
-                (String) payload.get("endDate"));
+    public ResponseEntity<List<Map<String, Object>>> getLabels(@RequestParam("userId") String userId, @RequestParam("startDate") String startDate, @RequestParam("endDate") String endDate) {
+        List<Map<String, Object>> labels = dayService.getLabels(userId, startDate, endDate);
 
         if (labels.isEmpty()) return ResponseEntity.notFound().build();
         return ResponseEntity.ok(labels);
+    }
+
+    // 월별 임금  & 월 근무시간: 확인 / 근데 임금 시간 계산이 좀 애매
+    @GetMapping("/calculate")
+    public ResponseEntity<Map<String, Object>> getMonthlyInfo(@RequestBody Map<String, Object> payload) {
+        Map<String, Object> monthlyData = dayService.getMonthlyInfo(
+                (String)payload.get("userId"),
+                (String) payload.get("startDate"),
+                (String) payload.get("endDate"));
+
+        if(monthlyData.isEmpty()) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(monthlyData);
     }
 
     // 근무 저장기록 -> 확인
@@ -34,7 +43,7 @@ public class CalendarController {
     public ResponseEntity<List<Map<String, Object>>> showSchedule(@RequestBody Map<String, Object> payload) {
         List<Map<String, Object>> schedules = dayService.getWorkList(
                 (String) payload.get("userId"),
-                (String) payload.get("date"));
+                (String) payload.get("selectedDate"));
 
         if(schedules.isEmpty()) return ResponseEntity.notFound().build();
         return ResponseEntity.ok(schedules);
@@ -68,17 +77,5 @@ public class CalendarController {
     public ResponseEntity<?> modifyWork(@RequestBody Map<String, Object> payload) {
         workplaceService.modifyWork(payload);
         return ResponseEntity.ok().build();
-    }
-
-    // 월별 임금  & 월 근무시간: 확인 / 근데 임금 시간 계산이 좀 애매
-    @GetMapping("/calculate")
-    public ResponseEntity<Map<String, Object>> getMonthlyInfo(@RequestBody Map<String, Object> payload) {
-        Map<String, Object> monthlyData = dayService.getMonthlyInfo(
-                (String)payload.get("userId"),
-                (String) payload.get("startDate"),
-                (String) payload.get("endDate"));
-
-        if(monthlyData.isEmpty()) return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(monthlyData);
     }
 }

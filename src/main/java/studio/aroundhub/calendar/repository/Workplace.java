@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import studio.aroundhub.member.repository.User;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
