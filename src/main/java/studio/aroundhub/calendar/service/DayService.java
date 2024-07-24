@@ -170,7 +170,7 @@ public class DayService {
         double total = days.stream()
              .mapToDouble(Day::getDailyWage)
              .sum();
-
+        // user의 해당 달과 월급과 상이하면, 업데이트
         Map<String, Object> res = new HashMap<>();
         res.put("date", startDate + " - " + endDate);
         res.put("monthlyWage", total);

@@ -5,13 +5,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import studio.aroundhub.member.controller.request.LoginRequest;
-import studio.aroundhub.member.controller.request.SignUpRequest;
+import studio.aroundhub.member.dto.LoginRequest;
+import studio.aroundhub.member.dto.SignUpRequest;
 import studio.aroundhub.member.repository.User;
 import studio.aroundhub.member.repository.UserRepository;
 
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
