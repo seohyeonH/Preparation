@@ -29,27 +29,6 @@ public class UserController {
     }
 
     /**
-     * user 찾기
-     * user_id로 사용자 정보를 조회하고 반환하는 로직 -> calendar에 필요
-     * @param user_id database 내의 user 자체의 id
-     * @return user의 정보
-     */
-    @GetMapping("/{user_id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long user_id) {
-        User user = userRepository.findById(user_id).orElse(null);
-        return ResponseEntity.ok(user);
-    }
-
-    /**
-     * 회원 목록 조회 <br>
-     * @return List<Member>
-     */
-    @GetMapping("/userlist")
-    public ResponseEntity<?> getUserListTest() {
-        return ResponseEntity.ok(userService.showAllUser());
-    }
-
-    /**
      * 국가 설정
      * @param payload 선택한 국가 정보
      */
@@ -75,17 +54,16 @@ public class UserController {
      * @param signUpRequest 회원가입 요청 정보
      */
     @PostMapping("/signup")
-    public ResponseEntity<?> addMember(@RequestBody SignUpRequest signUpRequest, HttpSession session) {
+    public ResponseEntity<?> addMember(@RequestBody SignUpRequest signUpRequest) {
         try {
-            String country = temporaryResponse.getCountry(session.getId());
+            /* String country = temporaryResponse.getCountry(session.getId());
             String language = temporaryResponse.getLanguage(session.getId());
 
             signUpRequest.setCountry(country);
             signUpRequest.setLanguage(language);
-
+            */
             userService.signUp(signUpRequest);
-
-            temporaryResponse.remoteCountryAndLanguage(session.getId());
+            //temporaryResponse.remoteCountryAndLanguage(session.getId());
 
             return ResponseEntity.ok("[ User Info ]");
         } catch (IllegalArgumentException e) {

@@ -28,7 +28,8 @@ public class WorkplaceService {
         w.setLabel((String) workplace.get("color"));
         w.setType((String) workplace.get("type"));
         w.setStartTime(LocalDateTime.of(date, LocalTime.parse((String) workplace.get("startTime"))));
-        w.setFinalTime(LocalDateTime.of(date, LocalTime.parse((String) workplace.get("endTime"))));
+        w.setFinalTime( (LocalTime.parse((String) workplace.get("endTime")).isBefore(LocalTime.parse((String) workplace.get("startTime")))) ?
+                LocalDateTime.of(date.plusDays(1), LocalTime.parse((String) workplace.get("endTime"))) : LocalDateTime.of(date, LocalTime.parse((String) workplace.get("endTime"))));
         w.setBreaktime((Integer) workplace.get("breakTime"));
         w.setNightbreak((Integer) workplace.get("nightBreak"));
         w.setCalculatemin((Boolean) workplace.get("IsMin"));
@@ -73,9 +74,6 @@ public class WorkplaceService {
             dayService.calculateTodayWage(day.getId(), w.getWorkplace_id());
         }
         dayRepository.saveAll(selected);
-
-        //for (Day d : selected)
-        //    dayService.calculateTodayWage(d.getId(), d.getWorkplaces().get(0).getWorkplace_id());
     }
 
     // Delete Work
@@ -85,7 +83,8 @@ public class WorkplaceService {
         String workplace = ((String) payload.get("workplace"));
         LocalDate date = LocalDate.parse((String) payload.get("date"));
         LocalDateTime startTime = LocalDateTime.of(date, LocalTime.parse((String) payload.get("startTime")));
-        LocalDateTime finalTime = LocalDateTime.of(date, LocalTime.parse((String) payload.get("endTime")));
+        LocalDateTime finalTime = LocalTime.parse((String) payload.get("endTime")).isBefore(LocalTime.parse((String) payload.get("startTime"))) ?
+                LocalDateTime.of(date.plusDays(1), LocalTime.parse((String) payload.get("endTime"))) : LocalDateTime.of(date, LocalTime.parse((String) payload.get("endTime")));
 
         User user = userRepository.findByLoginId(userId).orElseThrow(() -> new RuntimeException("User not found"));
         if (user == null) return;

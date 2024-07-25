@@ -6,10 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import studio.aroundhub.calendar.repository.*;
 import studio.aroundhub.member.repository.*;
 
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,6 +17,7 @@ public class DayService {
     private final DayRepository dayRepository;
     private final WorkplaceRepository workplaceRepository;
     private final UserRepository userRepository;
+    private final UserSalaryRepository userSalaryRepository;
 
     // 월별 라벨 색상 패스
     @Transactional(readOnly = true)
@@ -100,19 +98,21 @@ public class DayService {
     }
 
     private double calculateNightWorkHours(LocalDateTime startTime, LocalDateTime endTime, int nightBreak) {
-        LocalTime Start = LocalTime.of(22, 0);
-        LocalTime End = LocalTime.of(6, 0);
+        // 야간 근무 시작과 종료 시간 설정
+        LocalTime nightStartTime = LocalTime.of(22, 0); // 야간 시작 시간
+        LocalTime nightEndTime = LocalTime.of(6, 0);   // 야간 종료 시간 (다음 날 오전 6시)
 
-        LocalDateTime nightStartDateTime = LocalDateTime.of(startTime.toLocalDate(), Start);
-        LocalDateTime nightEndDateTime = LocalDateTime.of(endTime.toLocalDate(), End);
+        // 근무 당일 날짜와 다음 날짜
+        LocalDate today = startTime.toLocalDate();
+        LocalDate tomorrow = today.plusDays(1);
 
-        // 필요한 경우, 날짜 조정
-        if (startTime.toLocalTime().isAfter(End) && startTime.toLocalTime().isBefore(Start))
-            nightStartDateTime = nightStartDateTime.plusDays(1);
-        if (endTime.toLocalTime().isAfter(End) && endTime.toLocalTime().isBefore(Start))
-            nightEndDateTime = nightEndDateTime.plusDays(1);
+        // 야간 근무 시간 구간 설정
+        LocalDateTime nightStartDateTime = LocalDateTime.of(today, nightStartTime);
+        LocalDateTime nightEndDateTime = LocalDateTime.of(tomorrow, nightEndTime);
 
+        // 야간 근무 시간 계산
         double nightWorkHours = 0;
+
         if (startTime.isBefore(nightStartDateTime) && endTime.isAfter(nightEndDateTime))
             nightWorkHours = Duration.between(nightStartDateTime, nightEndDateTime).toHours();
 
@@ -125,9 +125,10 @@ public class DayService {
         else if (startTime.isAfter(nightStartDateTime) && endTime.isBefore(nightEndDateTime))
             nightWorkHours = Duration.between(startTime, endTime).toHours();
 
+
         nightWorkHours -= nightBreak / 60.0;
 
-        return nightWorkHours;
+        return Math.max(nightWorkHours, 0);
     }
 
     // 일별 임금 계산 -> 월 임금까지 영향
@@ -146,7 +147,7 @@ public class DayService {
     }
 
     // 월별 임금 & 월 근무시간 패스
-    @Transactional(readOnly = true)
+    @Transactional
     public Map<String, Object> getMonthlyInfo(String loginId, String startDate, String endDate) {
         User user = userRepository.findByLoginId(loginId).orElse(null);
         if (user == null) return Map.of();
@@ -170,12 +171,32 @@ public class DayService {
         double total = days.stream()
              .mapToDouble(Day::getDailyWage)
              .sum();
-        // user의 해당 달과 월급과 상이하면, 업데이트
+
+        // user의 해당 달과 월급과 상이하면, 업데이트 & 없으면 생성
+        Month month = start.getMonth();
+        Optional<UserSalary> userSalary = userSalaryRepository.findByUserAndMonth(user, month);
+
+        if (userSalary.isPresent()) {
+            UserSalary check = userSalary.get();
+            if (check.getSalary() != total) {
+                check.setSalary(total);
+                userSalaryRepository.save(check);
+            }
+        }
+        else {
+            UserSalary check = new UserSalary();
+            check.setUser(user);
+            check.setMonth(month);
+            check.setSalary(total);
+            userSalaryRepository.save(check);
+        }
+
         Map<String, Object> res = new HashMap<>();
         res.put("date", startDate + " - " + endDate);
         res.put("monthlyWage", total);
         res.put("totalHour", hours + "H " + minutes + "M");
 
+        System.out.println("여기까지 오는건가?");
         return res;
     }
 

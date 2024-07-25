@@ -24,7 +24,7 @@ public class SecurityConfig {
         http
                 .csrf().disable()
                 .authorizeRequests(authorize -> authorize
-                        .requestMatchers("/api", "/api/", "/api/**", "/ba;da", "/ba;da/**").permitAll()
+                        .requestMatchers("/api", "/api/", "/api/**").permitAll()
                 )
                 .cors().configurationSource(corsConfigurationSource()); // CORS 설정 활성화
 
@@ -37,6 +37,7 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
+        config.addAllowedOrigin("http://192.168.0.10:8085");
         config.addAllowedOrigin("http://172.20.10.12:53696");
         config.addAllowedHeader("*");
         config.addAllowedMethod(HttpMethod.GET);

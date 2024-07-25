@@ -2,6 +2,7 @@ package studio.aroundhub.member.service;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.java.Log;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,12 +18,6 @@ import java.util.List;
 public class UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
-
-    // 가입한 user 확인
-    @Transactional(readOnly = true)
-    public List<User> showAllUser() {
-        return userRepository.findAll();
-    }
 
     // 회원가입
     @Transactional

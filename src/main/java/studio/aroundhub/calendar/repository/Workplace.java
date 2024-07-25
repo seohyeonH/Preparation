@@ -41,11 +41,11 @@ public class Workplace {
     private double wage;
 
     @JsonProperty("startTime")
-    @Column(name = "startTime", nullable = false)
+    @Column(name = "start_time", nullable = false)
     private LocalDateTime startTime;
 
     @JsonProperty("endTime")
-    @Column(name = "finalTime", nullable = false)
+    @Column(name = "final_time", nullable = false)
     private LocalDateTime finalTime;
 
     @Column(name = "calculatemin", nullable = false)

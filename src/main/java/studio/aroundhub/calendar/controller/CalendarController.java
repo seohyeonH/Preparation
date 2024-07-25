@@ -17,7 +17,7 @@ public class CalendarController {
     private final WorkplaceService workplaceService;
     private final DayService dayService;
 
-    // 월 라벨 데이터 패스 -> 확인
+    // 월 라벨 데이터 패스
     @GetMapping("/calendar")
     public ResponseEntity<List<Map<String, Object>>> getLabels(@RequestParam("userId") String userId, @RequestParam("startDate") String startDate, @RequestParam("endDate") String endDate) {
         List<Map<String, Object>> labels = dayService.getLabels(userId, startDate, endDate);
@@ -26,7 +26,7 @@ public class CalendarController {
         return ResponseEntity.ok(labels);
     }
 
-    // 월별 임금  & 월 근무시간: 확인 / 근데 임금 시간 계산이 좀 애매
+    // 월별 임금  & 월 근무시간
     @GetMapping("/calculate")
     public ResponseEntity<Map<String, Object>> getMonthlyInfo(@RequestBody Map<String, Object> payload) {
         Map<String, Object> monthlyData = dayService.getMonthlyInfo(
@@ -38,7 +38,7 @@ public class CalendarController {
         return ResponseEntity.ok(monthlyData);
     }
 
-    // 근무 저장기록 -> 확인
+    // 근무 저장기록
     @GetMapping("/schedule")
     public ResponseEntity<List<Map<String, Object>>> showSchedule(@RequestBody Map<String, Object> payload) {
         List<Map<String, Object>> schedules = dayService.getWorkList(
@@ -49,21 +49,21 @@ public class CalendarController {
         return ResponseEntity.ok(schedules);
     }
 
-    // Add work -> 확인
+    // Add work
     @PostMapping("/schedule")
     public ResponseEntity<?> addWork(@RequestBody Map<String, Object> payload){
         workplaceService.addWork(payload);
         return ResponseEntity.ok().build();
     }
 
-    // Delete work -> 확인
+    // Delete work
     @DeleteMapping("/schedule")
     public ResponseEntity<?> deleteWork(@RequestBody Map<String, Object> payload) {
         workplaceService.deleteWork(payload);
         return ResponseEntity.ok().build();
     }
 
-    // Modify work 1 (정보 확인) -> 확인
+    // Modify work (정보 확인)
     @GetMapping("/modify")
     public ResponseEntity<Map<String, Object>> getWorkplace(@RequestBody Map<String, Object> payload) {
         Map<String, Object> data = workplaceService.modify(payload);
