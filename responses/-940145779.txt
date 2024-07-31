@@ -1,0 +1,23 @@
+1. Basic information: This includes the full name and address of both the employer and the employee.
+
+2. Employment terms: This includes the job title, job description, work location, and the starting date of the employment.
+
+3. Working hours and break times: According to South Korea's Labor Standards Act, the legal working hours should not exceed 40 hours per week excluding break times. Any changes to this should be clearly stated in the employment contract.
+
+4. Wages: The contract should detail the amount of wages, the calculation method, pay period, pay day including allowances and benefits.
+
+5. Holidays, Leave and Vacation: The contract must specify weekly holidays, annual paid leaves, and other holiday benefits according to the Labor Standards Act.
+
+6. Contract period and termination: The contract period should be indicated, along with conditions under which both parties can terminate the contract. This includes notice period and severance pay.
+
+7. Confidentiality agreement: This includes a provision for the protection of proprietary information and intellectual property of the company.
+
+8. Non-compete clause: This is used to prevent the employee from working with a competitor for a certain period after leaving the job.
+
+9. Insurance and pension: The contract should indicate terms for health insurance, national pension, employment insurance, and industrial accident compensation insurance as mandated by Korean law. 
+
+10. Other terms and conditions: This includes various terms related to the company's rules, regulations and policies. It might include dress code, code of conduct, or dispute resolution process, etc.
+
+11. Amendment clause: This clause stipulates the process for making changes to the contract. 
+
+Each clause in the contract should be in compliance with South Korea’s labor laws to ensure legality and fairness.

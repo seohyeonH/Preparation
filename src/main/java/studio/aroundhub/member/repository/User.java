@@ -1,5 +1,6 @@
 package studio.aroundhub.member.repository;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import studio.aroundhub.calendar.repository.Day;
@@ -38,6 +39,7 @@ public class User {
     @Column(name = "year", nullable = false)
     private int year;
 
+    @JsonProperty("loginId")
     @Column(name = "login_id", nullable = false, unique = true)
     private String loginId;
 
@@ -56,6 +58,10 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<UserSalary> monthlySalary = new ArrayList<>();
+
+    @Setter
+    @Column(name = "gallery", nullable = true)
+    private String gallery;
 
     @Builder
     public User(String firstname, String lastname, int month, int day, int year, String loginId, String password, String gender, String phoneNumber, String country, String language) {

@@ -1,60 +1,65 @@
 package studio.aroundhub.pado.controller;
 
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
+import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
-import studio.aroundhub.pado.dto.GPTRequest;
-import studio.aroundhub.pado.dto.GPTResponse;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import studio.aroundhub.member.repository.UserSession;
+import studio.aroundhub.member.repository.UserSessionRepository;
+import studio.aroundhub.pado.service.*;
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.io.File;
+import java.io.IOException;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
+@RequiredArgsConstructor
 public class BotController {
-    @Value("${openai.model}")
-    private String model;
+    private final ChatCacheService chatCacheService;
+    private final ExchangeService exchangeService;
+    private final PdfService pdfService;
+    private static final String START = "START";
+    private static final String WAITING_FOR_AGREEMENT = "WAITING_FOR_AGREEMENT";
+    private static final String WAITING_FOR_USER_INFO = "WAITING_FOR_USER_INFO";
+    private static final String WAITING_FOR_RESPONDENT_INFO = "WAITING_FOR_RESPONDENT_INFO";
+    private static final String WAITING_FOR_WAGE_PERIOD = "WAITING_FOR_WAGE_PERIOD";
+    private static final String WAITING_FOR_REASON = "WAITING_FOR_REASON";
+    private static final String WAITING_FOR_DEMAND = "WAITING_FOR_DEMAND";
+    private static final String WAITING_FOR_CONFIRMATION = "WAITING_FOR_CONFIRMATION";
+    private final UserSessionRepository userSessionRepository;
+    private final FileStorageService fileStorageService;
+    private final OpenAIService openAIService;
 
-    @Value("${openai.api.url}")
-    private String apiURL;
+    // 챗봇 사용
+    @GetMapping("/pado")
+    public String chat(@RequestParam(name = "userId") String userId, @RequestParam(name = "prompt") String prompt) throws IOException {
+        prompt = "Please answer this question based on the context in South Korea: " + prompt;
 
-    @Autowired
-    private RestTemplate restTemplate;
+        return chatCacheService.getInfo(prompt, false);
+    }
 
-    private final ConcurrentHashMap<String, String> cache = new ConcurrentHashMap<>();
+    // 진정서 작성
+    @GetMapping("/pado/write")
+    public ResponseEntity<?> writeDocument(@RequestParam(name = "userId") String userId, @RequestParam(name = "prompt") String message) throws IOException {
+        Object result = openAIService.writeDocument(userId, message);
 
-    @GetMapping("/chat")
-    public String chat(@RequestParam(name = "prompt") String prompt){
-        if (cache.containsKey(prompt)) {
-            return cache.get(prompt);
+        if (result instanceof String) return ResponseEntity.ok(result);
+        else if (result instanceof File file) {
+            HttpHeaders headers = new HttpHeaders();
+            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + file.getName());
+            return new ResponseEntity<>(new FileSystemResource(file), headers, HttpStatus.OK);
         }
+        else return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while processing the request.");
+    }
 
-        GPTRequest request = new GPTRequest(model, prompt);
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<GPTRequest> entity = new HttpEntity<>(request, headers);
-
-        try {
-            GPTResponse response = restTemplate.postForObject(apiURL, entity, GPTResponse.class);
-            String result = response.getChoices().get(0).getMessage().getContent();
-            cache.put(prompt, result);
-            return result;
-        } catch (HttpClientErrorException e) {
-            if (e.getStatusCode().value() == 429) {
-                return "Error: You have exceeded your current quota. Please check your plan and billing details. For more information, visit: https://platform.openai.com/docs/guides/error-codes/api-errors";
-            } else {
-                return "Error: " + e.getMessage();
-            }
-        } catch (Exception e) {
-            return "Error: " + e.getMessage();
-        }
+    // 환율
+    @GetMapping("/exchange")
+    public ResponseEntity<Map<String, Object>> getExchange(@RequestParam("userId") String userId, @RequestParam("date") String date) throws IOException {
+        Map<String, Object> res = exchangeService.getExchange(userId, date);
+        return ResponseEntity.ok(res);
     }
 }

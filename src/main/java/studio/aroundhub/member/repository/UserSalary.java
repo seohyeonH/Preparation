@@ -6,7 +6,7 @@ import lombok.*;
 import java.time.Month;
 
 @Entity
-@Table(name = "userSalary")
+@Table(name = "user_salary")
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Getter
 @Setter
@@ -17,7 +17,7 @@ public class UserSalary {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "loginId", nullable = false)
+    @JoinColumn(name = "login_id", nullable = false)
     private User user;
 
     @Enumerated(EnumType.STRING)
@@ -26,4 +26,10 @@ public class UserSalary {
 
     @Column(name = "salary")
     private Double salary;
+
+    @Column(name = "hour")
+    private long hour;
+
+    @Column(name = "minutes")
+    private long minutes;
 }

@@ -2,22 +2,35 @@ package studio.aroundhub.member.service;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import studio.aroundhub.calendar.repository.Day;
+import studio.aroundhub.calendar.repository.DayRepository;
+import studio.aroundhub.calendar.repository.WorkplaceRepository;
 import studio.aroundhub.member.dto.LoginRequest;
 import studio.aroundhub.member.dto.SignUpRequest;
 import studio.aroundhub.member.repository.User;
 import studio.aroundhub.member.repository.UserRepository;
+import studio.aroundhub.member.repository.UserSalary;
+import studio.aroundhub.member.repository.UserSalaryRepository;
 
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.Period;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final UserSalaryRepository userSalaryRepository;
+    private final WorkplaceRepository workplaceRepository;
+    private final DayRepository dayRepository;
 
     // 회원가입
     @Transactional
@@ -54,9 +67,9 @@ public class UserService {
     }
 
     @Transactional
-    public String login(LoginRequest loginRequest, HttpSession session) {
+    public String login(String loginId, String password) {
         // 로그인 아이디로 사용자 찾기
-        User user = userRepository.findByLoginId(loginRequest.getLoginId())
+        User user = userRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new IllegalArgumentException("Incorrect ID or Password. Please check again."));
 
         /* 로그인 유지 여부
@@ -67,7 +80,7 @@ public class UserService {
         user.setKeepLogin(loginRequest.isKeepLogin());*/
 
         // 해싱하여 저장해놓은 user의 비밀번호와 입력한 비밀번호가 일치한지 확인
-        if (passwordEncoder.matches(loginRequest.getPassword(), user.getPassword()))
+        if (passwordEncoder.matches(password, user.getPassword()))
             return user.getLoginId();
         else
             throw new IllegalArgumentException("Incorrect ID or Password. Please check again.");
@@ -137,8 +150,51 @@ public class UserService {
         userRepository.save(user);
     }
 
-    /* 다른 유저 정보 패스
-    public List<Map<String, Object>> getUsers() {
+    // 다른 유저 정보 패스
+    public List<Map<String, Object>> getUsers(String date) {
+        Month month = LocalDate.parse(date).getMonth();
+        List<User> users = userRepository.findAll();
+        if(users.size() <= 6) {
+            return users.stream()
+                    .map(user -> convertToMap(user, month))
+                    .collect(Collectors.toList());
+        }
+        else {
+            Collections.shuffle(users);
+            List<User> randomUsers = users.subList(0, 6);
+            return randomUsers.stream()
+                    .map(user -> convertToMap(user, month))
+                    .collect(Collectors.toList());
+        }
+    }
 
-    }*/
+    public List<Map<String, Object>> getUsersList(String date) {
+        Month month = LocalDate.parse(date).getMonth();
+        List<User> users = userRepository.findAll();
+        return users.stream()
+                .map(user -> convertToMap(user, month))
+                .collect(Collectors.toList());
+    }
+
+    private Map<String, Object> convertToMap(User user, Month month) {
+        UserSalary salary = userSalaryRepository.findByUserAndMonth(user, month).orElse(null);
+        if(salary == null) return Map.of();
+
+        Day workplaceDate = dayRepository.findByUserAndDate(user, LocalDate.parse("2024-07-22")).orElse(null);
+        if(workplaceDate == null) return Map.of();
+
+        String type = workplaceDate.getWorkplaces().get(0).getType();
+        LocalDate birth = LocalDate.of(user.getYear(), user.getMonth(), user.getDay());
+        LocalDate now = LocalDate.now();
+        int age = Period.between(birth, now).getYears();
+
+        String gender = (user.getGender().equals("Female")) ? "♀" : "♂";
+        return Map.of(
+                "Gender", gender,
+                "Age", age,
+                "Work Type", type,
+                "Monthly working hours", salary.getHour() + " H " + salary.getMinutes() + "M",
+                "Total Wage", salary.getSalary() + " ₩"
+        );
+    }
 }

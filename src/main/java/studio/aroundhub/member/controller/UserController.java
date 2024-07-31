@@ -10,9 +10,12 @@ import studio.aroundhub.member.dto.SignUpRequest;
 import studio.aroundhub.member.dto.TemporaryResponse;
 import studio.aroundhub.member.repository.User;
 import studio.aroundhub.member.repository.UserRepository;
+import studio.aroundhub.member.service.UserGalleryService;
 import studio.aroundhub.member.service.UserService;
 
+import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -21,7 +24,7 @@ import java.util.Map;
 public class UserController {
     private final UserService userService;
     private final TemporaryResponse temporaryResponse;
-    private final UserRepository userRepository;
+    private final UserGalleryService userGalleryService;
 
     @GetMapping("/")
     public String hello() {
@@ -76,8 +79,8 @@ public class UserController {
      * @return 로그인한 회원 정보
      */
     @GetMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest, HttpSession session) throws IllegalAccessException {
-        return ResponseEntity.ok(userService.login(loginRequest, session));
+    public ResponseEntity<String> login(@RequestParam(name = "Id") String Id, @RequestParam(name = "password") String password, LoginRequest loginRequest, HttpSession session) throws IllegalAccessException {
+        return ResponseEntity.ok(userService.login(Id, password));
     }
 
     /**
@@ -85,8 +88,7 @@ public class UserController {
      * @return 회원의 loginId
      */
     @GetMapping("/find-loginId")
-    public String findLoginId(@RequestParam String firstname, @RequestParam String lastname,
-                                                    @RequestParam String phoneNumber) {
+    public String findLoginId(@RequestParam(name = "firstName") String firstname, @RequestParam(name = "lastName") String lastname, @RequestParam(name = "phoneNumber") String phoneNumber) {
         return userService.findLoginId(firstname, lastname, phoneNumber);
     }
 
@@ -96,6 +98,8 @@ public class UserController {
     @PostMapping("/find-password")
     public ResponseEntity<?> findPassword(@RequestParam String loginId, @RequestParam String phoneNumber,
                                            @RequestParam String newPassword, @RequestParam String confirmPassword) {
+
+
         userService.findPassword(loginId, phoneNumber, newPassword, confirmPassword);
         return ResponseEntity.ok("{}");
     }
@@ -114,7 +118,7 @@ public class UserController {
     * 언어 변경
      */
     @PostMapping("/{user_id}/changeLanguage")
-    public ResponseEntity<?> changeLangugage(@PathVariable Long user_id, @RequestParam String newLanguage){
+    public ResponseEntity<?> changeLanguage(@PathVariable Long user_id, @RequestParam String newLanguage){
         userService.changeLanguage(user_id, newLanguage);
         return ResponseEntity.ok("{}");
     }
@@ -123,5 +127,34 @@ public class UserController {
     public ResponseEntity<?> handleException(Exception e) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(Map.of("message", e.getMessage()));
+    }
+
+    @GetMapping("/users0")
+    public ResponseEntity<List<Map<String, Object>>> getUsers(@RequestParam(name = "date") String date) {
+        List<Map<String, Object>> users = userService.getUsers(date);
+        return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/users1")
+    public ResponseEntity<List<Map<String, Object>>> getUsersList(@RequestParam(name = "date") String date) {
+        List<Map<String, Object>> users = userService.getUsersList(date);
+        return ResponseEntity.ok(users);
+    }
+
+    @PostMapping("/save")
+    public ResponseEntity<String> makeUserGallery(@RequestBody Map<String, Object> payload) throws IOException {
+        userGalleryService.makeUserGallery((String) payload.get("userId"), (String) payload.get("imageUrl"));
+            return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/save")
+    public ResponseEntity<List<String>> getUserGallery(@RequestParam(name = "userId") String userId) {
+        List<String> gallery = null;
+        try {
+            gallery = userGalleryService.getUserGallery(userId);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return ResponseEntity.ok(gallery);
     }
 }

@@ -1,8 +1,9 @@
 package studio.aroundhub.calendar.service;
-
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 import studio.aroundhub.calendar.repository.*;
 import studio.aroundhub.member.repository.*;
 
@@ -18,6 +19,7 @@ public class DayService {
     private final WorkplaceRepository workplaceRepository;
     private final UserRepository userRepository;
     private final UserSalaryRepository userSalaryRepository;
+    private final RestTemplate restTemplate;
 
     // 월별 라벨 색상 패스
     @Transactional(readOnly = true)
@@ -33,10 +35,11 @@ public class DayService {
                 .toList();
 
         List<Map<String, Object>> labels = new ArrayList<>();
+
         for (Day d : days) {
             d.getWorkplaces().forEach(workplace -> {
                 Map<String, Object> labelInfo = new HashMap<>();
-                labelInfo.put("Date", d.getDate().toString());
+                labelInfo.put("date", d.getDate());
                 labelInfo.put("workplace", workplace.getName());
                 labelInfo.put("color", workplace.getLabel());
                 labels.add(labelInfo);
@@ -86,11 +89,11 @@ public class DayService {
                     Duration duration = Duration.between(w.getStartTime(), w.getFinalTime());
 
                     double night = calculateNightWorkHours(w.getStartTime(), w.getFinalTime(), w.getNightbreak());
-                    double normal = (duration.toMinutes() - night * 60 - w.getBreaktime()) / 60.0;
+                    double normal = (duration.toMinutes() - w.getNightbreak() - w.getBreaktime()) / 60.0;
 
                     double wage = w.getWage();
 
-                    w.setTodayPay((wage * normal) + (wage * 1.5 * night));
+                    w.setTodayPay((wage * normal) + (wage * 0.5 * night));
                     workplaceRepository.save(w);
                 });
             calculateDailyWage(day_id);
@@ -124,7 +127,6 @@ public class DayService {
 
         else if (startTime.isAfter(nightStartDateTime) && endTime.isBefore(nightEndDateTime))
             nightWorkHours = Duration.between(startTime, endTime).toHours();
-
 
         nightWorkHours -= nightBreak / 60.0;
 
@@ -165,6 +167,7 @@ public class DayService {
                     Duration duration = Duration.between(workplace.getStartTime(), workplace.getFinalTime());
                     return duration.toMinutes();
                 }).sum();
+
         long hours = workHour / 60;
         long minutes = workHour % 60;
 
@@ -176,29 +179,27 @@ public class DayService {
         Month month = start.getMonth();
         Optional<UserSalary> userSalary = userSalaryRepository.findByUserAndMonth(user, month);
 
+        UserSalary check;
         if (userSalary.isPresent()) {
-            UserSalary check = userSalary.get();
-            if (check.getSalary() != total) {
-                check.setSalary(total);
-                userSalaryRepository.save(check);
-            }
+            check = userSalary.get();
+            if (check.getSalary() != total) check.setSalary(total);
+            if(check.getHour() != hours) check.setHour(hours);
+            if(check.getMinutes() != minutes) check.setMinutes(minutes);
         }
         else {
-            UserSalary check = new UserSalary();
+            check = new UserSalary();
             check.setUser(user);
             check.setMonth(month);
             check.setSalary(total);
-            userSalaryRepository.save(check);
+            check.setHour(hours);
+            check.setMinutes(minutes);
         }
+        userSalaryRepository.save(check);
 
         Map<String, Object> res = new HashMap<>();
-        res.put("date", startDate + " - " + endDate);
-        res.put("monthlyWage", total);
+        res.put("monthlyWage", total + " ₩");
         res.put("totalHour", hours + "H " + minutes + "M");
 
-        System.out.println("여기까지 오는건가?");
         return res;
     }
-
-    // 환율 적용한 월급 패스
 }

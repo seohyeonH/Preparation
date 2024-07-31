@@ -48,11 +48,10 @@ public class WorkplaceService {
         User user = userRepository.findByLoginId(userId).orElseThrow(() -> new RuntimeException("User not found"));
 
         List<Day> selected = new ArrayList<>();
-        List<Workplace> workToCal = new ArrayList<>();
 
         for (String ds : dates) {
             LocalDate date = LocalDate.parse(ds);
-            Day day = dayRepository.findByDate(date).orElseGet(() -> {
+            Day day = dayRepository.findByUserAndDate(user, date).orElseGet(() -> {
                 Day newD = new Day();
                 newD.setDate(date);
                 newD.setUser(user);
