@@ -143,7 +143,7 @@ public class DayService {
                 .mapToDouble(Workplace::getTodayPay)
                 .sum();
 
-            day.setDailyWage(dailyWage);
+            day.setDailyWage((int) dailyWage);
             dayRepository.save(day);
         }
     }
@@ -172,7 +172,7 @@ public class DayService {
         long minutes = workHour % 60;
 
         double total = days.stream()
-             .mapToDouble(Day::getDailyWage)
+             .mapToInt(Day::getDailyWage)
              .sum();
 
         // user의 해당 달과 월급과 상이하면, 업데이트 & 없으면 생성
@@ -182,7 +182,7 @@ public class DayService {
         UserSalary check;
         if (userSalary.isPresent()) {
             check = userSalary.get();
-            if (check.getSalary() != total) check.setSalary(total);
+            if (check.getSalary() != total) check.setSalary((int) total);
             if(check.getHour() != hours) check.setHour(hours);
             if(check.getMinutes() != minutes) check.setMinutes(minutes);
         }
@@ -190,7 +190,7 @@ public class DayService {
             check = new UserSalary();
             check.setUser(user);
             check.setMonth(month);
-            check.setSalary(total);
+            check.setSalary((int) total);
             check.setHour(hours);
             check.setMinutes(minutes);
         }

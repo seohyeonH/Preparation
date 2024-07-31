@@ -26,7 +26,7 @@ public class Day {
     public LocalDate date;
 
     @Column(name = "daily_wage")
-    private double dailyWage = 0;
+    private int dailyWage = 0;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

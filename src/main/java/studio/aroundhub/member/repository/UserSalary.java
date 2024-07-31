@@ -25,7 +25,7 @@ public class UserSalary {
     private Month month;
 
     @Column(name = "salary")
-    private Double salary;
+    private int salary;
 
     @Column(name = "hour")
     private long hour;
