@@ -31,10 +31,7 @@ public class UserController {
         return "Hello Ba;Da!";
     }
 
-    /**
-     * 국가 설정
-     * @param payload 선택한 국가 정보
-     */
+    // 국가 설정
     @PostMapping("/select_country")
     public ResponseEntity<String> selectCountry(@RequestBody Map<String, Object> payload, HttpSession session){
         String countryName = (String) payload.get("countryName");
@@ -42,9 +39,7 @@ public class UserController {
         return ResponseEntity.ok("Selected country: " + countryName);
     }
 
-    /** 언어 설정
-     * @param payload 선택한 언어 정보
-     */
+    // 언어 설정
     @PostMapping("/select_language")
     public ResponseEntity<String> selectLanguage(@RequestBody Map<String, Object> payload, HttpSession session){
         String language = (String) payload.get("language");
@@ -52,10 +47,7 @@ public class UserController {
         return ResponseEntity.ok("Selected country: " + language);
     }
 
-    /**
-     * 회원가입
-     * @param signUpRequest 회원가입 요청 정보
-     */
+    // 회원가입
     @PostMapping("/signup")
     public ResponseEntity<?> addMember(@RequestBody SignUpRequest signUpRequest) {
         try {
@@ -74,39 +66,27 @@ public class UserController {
         }
     }
 
-    /**
-     * 로그인
-     * @return 로그인한 회원 정보
-     */
+    // 로그인
     @GetMapping("/login")
     public ResponseEntity<String> login(@RequestParam(name = "Id") String Id, @RequestParam(name = "password") String password, LoginRequest loginRequest, HttpSession session) throws IllegalAccessException {
         return ResponseEntity.ok(userService.login(Id, password));
     }
 
-    /**
-     * 아이디 찾기
-     * @return 회원의 loginId
-     */
+    // 아이디 찾기
     @GetMapping("/find-loginId")
     public String findLoginId(@RequestParam(name = "firstName") String firstname, @RequestParam(name = "lastName") String lastname, @RequestParam(name = "phoneNumber") String phoneNumber) {
         return userService.findLoginId(firstname, lastname, phoneNumber);
     }
 
-    /**
-     * 비밀번호 찾기
-     */
+    // 비밀번호 찾기
     @PostMapping("/find-password")
     public ResponseEntity<?> findPassword(@RequestParam String loginId, @RequestParam String phoneNumber,
                                            @RequestParam String newPassword, @RequestParam String confirmPassword) {
-
-
         userService.findPassword(loginId, phoneNumber, newPassword, confirmPassword);
         return ResponseEntity.ok("{}");
     }
 
-    /**
-     * 비밀번호 변경
-     */
+    // 비밀번호 변경
     @PostMapping("/{user_id}/changePassword")
     public ResponseEntity<?> changePassword(@PathVariable Long user_id, @RequestParam String currentPassword,
                                             @RequestParam String newPassword, @RequestParam String confirmPassword){
@@ -114,47 +94,44 @@ public class UserController {
         return ResponseEntity.ok("{}");
     }
 
-    /**
-    * 언어 변경
-     */
+    // 언어 변경
     @PostMapping("/{user_id}/changeLanguage")
     public ResponseEntity<?> changeLanguage(@PathVariable Long user_id, @RequestParam String newLanguage){
         userService.changeLanguage(user_id, newLanguage);
         return ResponseEntity.ok("{}");
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleException(Exception e) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Map.of("message", e.getMessage()));
-    }
-
+    // Users Info 패스
     @GetMapping("/users0")
     public ResponseEntity<List<Map<String, Object>>> getUsers(@RequestParam(name = "date") String date) {
         List<Map<String, Object>> users = userService.getUsers(date);
         return ResponseEntity.ok(users);
     }
 
+    // 전체 User Info 패스
     @GetMapping("/users1")
     public ResponseEntity<List<Map<String, Object>>> getUsersList(@RequestParam(name = "date") String date) {
         List<Map<String, Object>> users = userService.getUsersList(date);
         return ResponseEntity.ok(users);
     }
 
+    // 갤러리 이미지 저장
     @PostMapping("/save")
     public ResponseEntity<String> makeUserGallery(@RequestBody Map<String, Object> payload) throws IOException {
         userGalleryService.makeUserGallery((String) payload.get("userId"), (String) payload.get("imageUrl"));
             return ResponseEntity.ok().build();
     }
 
+    // 갤러리 이미지 패스
     @GetMapping("/save")
-    public ResponseEntity<List<String>> getUserGallery(@RequestParam(name = "userId") String userId) {
-        List<String> gallery = null;
-        try {
-            gallery = userGalleryService.getUserGallery(userId);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public ResponseEntity<List<String>> getUserGallery(@RequestParam(name = "userId") String userId) throws IOException {
+        List<String> gallery = userGalleryService.getUserGallery(userId);
         return ResponseEntity.ok(gallery);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<?> handleException(Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("message", e.getMessage()));
     }
 }

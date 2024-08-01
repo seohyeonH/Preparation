@@ -1,14 +1,19 @@
 Information for Writing a Wage Arrears Complaint Letter:
 
-1. Applicant Name: Hong Seohyun
-2. Nationality: Thailand
-3. Position: part-time
-4. Respondent's Name:  Lee Myungwoo
-5. Respondent's Contact Information: 0000000
-6. Company Name: Bad Company
-7. Company Address: Yongin-si Suji-gu Gyeonggi-do
-8. Arrears Amount: 700000 KRW
-9. Period of Arrears: from May 20 to June 20
-10. Background and Reasons for Wage Arrears:
- The employer initially said the salary would be 2,000,000 KRW, but later changed it to 1,300,000 KRW. When I asked for the additional 700,000 KRW, they questioned whether I had proof of the 2,000,000 KRW they promised, so I am writing this complaint letter.
-11. Demands in the Complaint Letter: To receive the 700,000 KRW that was promised.
+1. Petitioner: SeohyeonHong
+2. Nationality: USA
+3. Foreign Registration Number: 00000000
+4. Address: 01099753084 Ansan
+5. Phone Number: 01099753084
+
+6. Respondent's Name: Lee Myungwoo
+7. Respondent's Phone Number: 0000000
+8. Company Name: Bad Company
+9. Company Address: Yongin-si Suji-gu Gyeonggi-do
+
+10. Arrears Amount: 700000 KRW
+11. Period of Arrears: from May 20 to June 20
+
+12. Background and Reasons for Wage Arrears: The employer initially said the salary would be 2,000,000 KRW, but later changed it to 1,300,000 KRW. When I asked for the additional 700,000 KRW, they questioned whether I had proof of the 2,000,000 KRW they promised, so I am writing this complaint letter.
+
+13. Demands in the Complaint Letter: To receive the 700,000 KRW that was promised.

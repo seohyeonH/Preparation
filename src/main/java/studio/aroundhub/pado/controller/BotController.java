@@ -1,15 +1,12 @@
 package studio.aroundhub.pado.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import studio.aroundhub.pado.service.*;
 
-import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -28,18 +25,12 @@ public class BotController {
         return chatCacheService.getInfo(prompt, false);
     }
 
-    // 진정서 작성
+    // 진정서
     @GetMapping("/pado/write")
-    public ResponseEntity<?> writeDocument(@RequestParam(name = "userId") String userId, @RequestParam(name = "prompt") String message) throws IOException {
-        Object result = openAIService.writeDocument(userId, message);
+    public ResponseEntity<List<String>> writeDocument(@RequestParam(name = "userId") String userId, @RequestParam(name = "prompt") String message) throws Exception {
+        List<String> result = openAIService.writeDocument(userId, message);
 
-        if (result instanceof String) return ResponseEntity.ok(result);
-        else if (result instanceof File file) {
-            HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + file.getName());
-            return new ResponseEntity<>(new FileSystemResource(file), headers, HttpStatus.OK);
-        }
-        else return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while processing the request.");
+        return ResponseEntity.ok(result);
     }
 
     // 환율

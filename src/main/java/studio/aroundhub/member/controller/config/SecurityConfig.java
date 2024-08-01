@@ -38,6 +38,7 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
         config.addAllowedOrigin("http://10.50.1.103:53696");
+        config.addAllowedOrigin("http://172.20.10.12:53696");
         config.addAllowedOrigin("http://10.50.1.107:8085");
         config.addAllowedHeader("*");
         config.addAllowedMethod(HttpMethod.GET);

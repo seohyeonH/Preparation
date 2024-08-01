@@ -70,11 +70,4 @@ public class CalendarController {
         if(data.isEmpty()) return ResponseEntity.notFound().build();
         return ResponseEntity.ok(data);
     }
-
-    // Modify work 2 (정보 수정)
-    @PutMapping("/schedule")
-    public ResponseEntity<?> modifyWork(@RequestBody Map<String, Object> payload) {
-        workplaceService.modifyWork(payload);
-        return ResponseEntity.ok().build();
-    }
 }

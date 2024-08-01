@@ -24,34 +24,25 @@ public class SMSService {
 
     @Transactional
     public SingleMessageSentResponse sendVerificationCode(String to) {
-        // 인증번호 생성
         String verificationCode = generateCode();
 
-        // 메세지 구성
         Message message = new Message();
         message.setFrom(fromNumber);
         message.setTo(to);
         message.setText("[Ba;da] 아래의 인증번호를 입력해주세요\n" + verificationCode);
 
-        // 메세지 전송
         SingleMessageSendingRequest request = new SingleMessageSendingRequest(message);
         SingleMessageSentResponse response = messageService.sendOne(request);
 
-        // SMS 전송 결과 검사
-        if (response == null) {
-            throw new RuntimeException("SMS 전송에 실패했습니다.");
-        }
+        if (response == null) throw new RuntimeException("SMS 전송에 실패했습니다.");
 
         verificationRepository.save(new Verification(to, verificationCode));
-
         return response;
     }
 
     private String generateCode() {
         Random random = new Random();
-        int code = random.nextInt((int) Math.pow(10, 6));
-
-        return String.format("%06d", code);
+        return String.format("%06d", random.nextInt((int) Math.pow(10, 6)));
     }
 
     @Transactional
@@ -61,11 +52,8 @@ public class SMSService {
         if (latestCode != null) {
             LocalDateTime now = LocalDateTime.now();
 
-            if (ChronoUnit.MINUTES.between(latestCode.getCreatedAt(), now) <= 5) {
-                return latestCode.getCode().equals(Code);
-            }
+            if (ChronoUnit.MINUTES.between(latestCode.getCreatedAt(), now) <= 5) return latestCode.getCode().equals(Code);
         }
-
         return false;
     }
 

@@ -6,10 +6,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import studio.aroundhub.member.repository.User;
 
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
@@ -58,17 +56,4 @@ public class Workplace {
 
     @Column(name = "today_pay")
     public double todayPay = 0;
-
-    public Workplace(Long workplace_id, String name, String label, String type, int breaktime, int nightbreak, LocalDateTime startTime, LocalDateTime finalTime, double wage, Day day) {
-        this.workplace_id = workplace_id;
-        this.name = name;
-        this.label = label;
-        this.type = type;
-        this.startTime = startTime;
-        this.finalTime = finalTime;
-        this.breaktime = breaktime;
-        this.nightbreak = nightbreak;
-        this.wage = wage;
-        this.day = day;
-    }
 }

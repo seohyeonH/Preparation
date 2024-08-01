@@ -17,17 +17,18 @@ import java.net.URL;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Locale;
+import java.util.*;
 
+import studio.aroundhub.calendar.repository.Day;
+import studio.aroundhub.calendar.repository.DayRepository;
+import studio.aroundhub.calendar.repository.Workplace;
+import studio.aroundhub.calendar.repository.WorkplaceRepository;
 import studio.aroundhub.member.repository.User;
 import studio.aroundhub.member.repository.UserRepository;
 import studio.aroundhub.member.repository.UserSalary;
 import studio.aroundhub.member.repository.UserSalaryRepository;
 import javax.net.ssl.*;
 import java.security.cert.X509Certificate;
-import java.util.Map;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +36,8 @@ public class ExchangeService {
     private final ChatCacheService chatCacheService;
     private final UserRepository userRepository;
     private final UserSalaryRepository userSalaryRepository;
+    private final DayRepository dayRepository;
+    private final WorkplaceRepository workplaceRepository;
     @Value("${exchange.api.key}")
     private String apiKey;
     private static final String API_URL = "https://www.koreaexim.go.kr/site/program/financial/exchangeJSON";
@@ -79,6 +82,7 @@ public class ExchangeService {
         try {
             disableSslVerification();
             URL url = new URL(API_URL + "?authkey=" + apiKey + "&searchdate=" + date + "&data=" + dataType);
+            System.out.println("Request URL: " + url);
             con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
             con.setConnectTimeout(5000);
@@ -88,11 +92,14 @@ public class ExchangeService {
             reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
             StringBuilder responseContent = new StringBuilder();
             String line;
-            while ((line = reader.readLine()) != null) {
-                responseContent.append(line);
-            }
+            while ((line = reader.readLine()) != null) responseContent.append(line);
 
-            JSONArray rateList = (JSONArray) parser.parse(responseContent.toString());
+            String response = responseContent.toString();
+            System.out.println("Response Content: " + response);
+
+            if (response.isEmpty()) throw new RuntimeException("Empty response from API");
+
+            JSONArray rateList = (JSONArray) parser.parse(response);
             for (Object r : rateList) {
                 JSONObject exchangeRateInfo = (JSONObject) r;
                 if (exchangeRateInfo.get("cur_unit").equals(code)) {
@@ -102,7 +109,8 @@ public class ExchangeService {
                 }
             }
         } catch (IOException | ParseException | java.text.ParseException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace(); // Print the stack trace
+            throw new RuntimeException("Failed to get exchange rate", e);
         } finally {
             if (reader != null) {
                 try {
@@ -132,7 +140,7 @@ public class ExchangeService {
 
         String prompt = user.getCountry() + "의 통화기호를 키워드로만 알려줘.";
         String code = chatCacheService.getInfo(prompt, true);
-        double exchangeCost = salary.getSalary() / 190.17;
+        double exchangeCost = salary.getSalary() / 1370.14;
 
         if (Objects.equals(code, "USD")) code = "$";
         else if (Objects.equals(code, "CNY")) code = "Y";

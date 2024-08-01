@@ -23,6 +23,8 @@ public class UserGalleryService {
     private final FileStorageService fileStorageService;
 
     public void makeUserGallery(String userId, String imageUrl) throws IOException {
+        boolean isFileEmpty = true;
+
         User user = userRepository.findByLoginId(userId).orElseThrow(() ->
                 new IllegalArgumentException("User not found."));
 
@@ -33,9 +35,9 @@ public class UserGalleryService {
             Files.createDirectories(filePath.getParent());
         } else filePath = Paths.get(user.getGallery());
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath.toString()))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath.toFile(), true))) {
+            if (Files.size(filePath) > 0) writer.newLine();
             writer.write(imageUrl);
-            writer.newLine();
         } catch (IOException e) {
             e.printStackTrace();
             throw e;

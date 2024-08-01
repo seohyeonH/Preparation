@@ -118,13 +118,10 @@ public class DayService {
 
         if (startTime.isBefore(nightStartDateTime) && endTime.isAfter(nightEndDateTime))
             nightWorkHours = Duration.between(nightStartDateTime, nightEndDateTime).toHours();
-
         else if (startTime.isBefore(nightStartDateTime) && endTime.isAfter(nightStartDateTime))
             nightWorkHours = Duration.between(nightStartDateTime, endTime).toHours();
-
         else if (startTime.isBefore(nightEndDateTime) && endTime.isAfter(nightEndDateTime))
             nightWorkHours = Duration.between(startTime, nightEndDateTime).toHours();
-
         else if (startTime.isAfter(nightStartDateTime) && endTime.isBefore(nightEndDateTime))
             nightWorkHours = Duration.between(startTime, endTime).toHours();
 

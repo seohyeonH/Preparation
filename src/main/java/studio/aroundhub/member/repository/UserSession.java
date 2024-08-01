@@ -14,7 +14,9 @@ public class UserSession {
     private String state;
     private String nationality;
     private String userName;
-    private String position;
+    private String phoneNumber;
+    private String address;
+    private String foreignNumber;
     private String respondentName;
     private String respondentContact;
     private String companyName;

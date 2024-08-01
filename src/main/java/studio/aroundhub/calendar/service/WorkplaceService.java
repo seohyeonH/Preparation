@@ -134,35 +134,4 @@ public class WorkplaceService {
                 }).orElse(Map.of()))
         .orElse(Map.of());
     }
-
-    // Modify Work
-    @Transactional
-    public void modifyWork(Map<String, Object> payload) {
-        @SuppressWarnings("unchecked")
-        Map<String, Object> workplace = (Map<String, Object>) payload.get("workplace");
-        LocalDate date = LocalDate.parse((String) payload.get("date"));
-        String userId = (String) payload.get("userId");
-
-        User user = userRepository.findByLoginId(userId).orElse(null);
-
-        List<Workplace> workToCal = new ArrayList<>();
-
-        dayRepository.findByUserAndDate(user, date).ifPresent(day -> {
-            List<Workplace> workplaces = day.getWorkplaces();
-
-            workplaces.stream()
-                    .filter(w -> w.getName().equals((String) workplace.get("workplace")))
-                    .findFirst()
-                    .ifPresent(w -> {
-                        multiWorkplace(w, workplace, date);
-                        w.setDay(day);
-
-                        workToCal.add(w);
-                    });
-            dayRepository.save(day);
-        });
-
-        for (Workplace w : workToCal)
-            dayService.calculateTodayWage(w.getDay().getId(), w.getWorkplace_id());
-    }
 }
