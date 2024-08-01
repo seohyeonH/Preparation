@@ -6,14 +6,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import studio.aroundhub.member.repository.UserSession;
-import studio.aroundhub.member.repository.UserSessionRepository;
 import studio.aroundhub.pado.service.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
@@ -21,17 +18,6 @@ import java.util.Optional;
 public class BotController {
     private final ChatCacheService chatCacheService;
     private final ExchangeService exchangeService;
-    private final PdfService pdfService;
-    private static final String START = "START";
-    private static final String WAITING_FOR_AGREEMENT = "WAITING_FOR_AGREEMENT";
-    private static final String WAITING_FOR_USER_INFO = "WAITING_FOR_USER_INFO";
-    private static final String WAITING_FOR_RESPONDENT_INFO = "WAITING_FOR_RESPONDENT_INFO";
-    private static final String WAITING_FOR_WAGE_PERIOD = "WAITING_FOR_WAGE_PERIOD";
-    private static final String WAITING_FOR_REASON = "WAITING_FOR_REASON";
-    private static final String WAITING_FOR_DEMAND = "WAITING_FOR_DEMAND";
-    private static final String WAITING_FOR_CONFIRMATION = "WAITING_FOR_CONFIRMATION";
-    private final UserSessionRepository userSessionRepository;
-    private final FileStorageService fileStorageService;
     private final OpenAIService openAIService;
 
     // 챗봇 사용

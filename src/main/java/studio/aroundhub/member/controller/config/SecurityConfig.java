@@ -37,11 +37,8 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOrigin("http://172.20.10.10:53696");
-        config.addAllowedOrigin("http://192.168.0.10:8085");
-        config.addAllowedOrigin("http://192.168.0.20:53696");
-        config.addAllowedOrigin("http://172.20.10.12:8085");
-        config.addAllowedOrigin("http://localhost:53696");
+        config.addAllowedOrigin("http://10.50.1.103:53696");
+        config.addAllowedOrigin("http://10.50.1.107:8085");
         config.addAllowedHeader("*");
         config.addAllowedMethod(HttpMethod.GET);
         config.addAllowedMethod(HttpMethod.POST);
