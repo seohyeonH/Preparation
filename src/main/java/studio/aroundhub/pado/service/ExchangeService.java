@@ -19,16 +19,11 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import studio.aroundhub.calendar.repository.Day;
-import studio.aroundhub.calendar.repository.DayRepository;
-import studio.aroundhub.calendar.repository.Workplace;
-import studio.aroundhub.calendar.repository.WorkplaceRepository;
 import studio.aroundhub.member.repository.User;
 import studio.aroundhub.member.repository.UserRepository;
 import studio.aroundhub.member.repository.UserSalary;
 import studio.aroundhub.member.repository.UserSalaryRepository;
 import javax.net.ssl.*;
-import java.security.cert.X509Certificate;
 
 @Service
 @RequiredArgsConstructor
@@ -36,8 +31,6 @@ public class ExchangeService {
     private final ChatCacheService chatCacheService;
     private final UserRepository userRepository;
     private final UserSalaryRepository userSalaryRepository;
-    private final DayRepository dayRepository;
-    private final WorkplaceRepository workplaceRepository;
     @Value("${exchange.api.key}")
     private String apiKey;
     private static final String API_URL = "https://www.koreaexim.go.kr/site/program/financial/exchangeJSON";
@@ -109,7 +102,7 @@ public class ExchangeService {
                 }
             }
         } catch (IOException | ParseException | java.text.ParseException e) {
-            e.printStackTrace(); // Print the stack trace
+            e.printStackTrace();
             throw new RuntimeException("Failed to get exchange rate", e);
         } finally {
             if (reader != null) {
